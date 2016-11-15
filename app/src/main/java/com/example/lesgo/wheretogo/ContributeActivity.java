@@ -67,7 +67,6 @@ public class ContributeActivity extends AppCompatActivity {
                         getBaseContext(),
                         "Location changed: Lat: " + loc.getLatitude() + " Lng: "
                                 + loc.getLongitude(), Toast.LENGTH_SHORT).show();*/
-
                 eLat.setText(lat);
                 eLong.setText(longt);
 
@@ -80,9 +79,6 @@ public class ContributeActivity extends AppCompatActivity {
 
         // Register the listener with the Location Manager to receive location updates
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
-
-
-
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,16 +101,57 @@ public class ContributeActivity extends AppCompatActivity {
                     String address = first.getString("formatted_address");
 
                     Log.d("address",address);
-                    Toast.makeText(getBaseContext(),"Location" + address,Toast.LENGTH_SHORT).show();
+
+                    String sample = address;
+                    sample = sample.replace(",", "");
+
+                    String[] elements = sample.split(" ");
+                    for(String s :elements) {
+                      //  Log.d("a", s);
+                    }
+
+                    String input = eAddress.getText().toString();
+                    input = input.replace(",", "");
+                    String[] inputs = input.split(" ");
+                    for(String a:inputs){
+                     //   Log.d("a", a);
+                    }
+
+                    Boolean add = checkaddress(elements,inputs,elements.length);
+
+                    Toast.makeText(getBaseContext(),address,Toast.LENGTH_SHORT).show();
 
                    // Post(data.toString());
 
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-
             }
         });
+    }
+
+    private boolean checkaddress(String[] address, String[] input,int length){
+        int i = 0;
+
+        for(String a:address)
+        {
+            for(String b:input)
+            {
+                if(a.equalsIgnoreCase(b))
+                {
+                    i+=1;
+                    break;
+                }
+            }
+        }
+
+        double rounded = Math.round((double)length/2);
+        Log.d("round",String.valueOf(rounded));
+
+        if(i >= rounded)
+            return true;
+        else
+            return false;
     }
 
     private void Post(String data){
@@ -195,26 +232,16 @@ public class ContributeActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-       // locationManager.removeUpdates(llistener);
-
-    }
 
     @Override
     protected void onStop() {
         super.onStop();
         locationManager.removeUpdates(llistener);
-
     }
 
     @Override
     protected void onPostResume() {
-
         super.onPostResume();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
-
-
     }
 }
