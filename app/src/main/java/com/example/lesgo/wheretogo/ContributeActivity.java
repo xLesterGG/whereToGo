@@ -1,6 +1,10 @@
 package com.example.lesgo.wheretogo;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -9,12 +13,15 @@ import android.os.Looper;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.http.params.HttpConnectionParams;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,11 +40,15 @@ import java.net.URL;
 
 public class ContributeActivity extends AppCompatActivity {
 
-    Button submit;
+    Button submit,picture;
     EditText eName,eAddress,eLat,eLong,eDesc;
     String lat,longt;
     LocationManager locationManager;
     LocationListener llistener;
+    Bitmap selectedImage;
+    ImageView img;
+    String selectedImg = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +62,12 @@ public class ContributeActivity extends AppCompatActivity {
         submit = (Button)findViewById(R.id.submit);
         eName = (EditText)findViewById(R.id.name);
         eAddress= (EditText)findViewById(R.id.address);
+        eAddress.setText("lorong bayur bukit 18 93350 kuching sarawak");
         eLat= (EditText)findViewById(R.id.latitude);
         eLong= (EditText)findViewById(R.id.longitude);
         eDesc= (EditText)findViewById(R.id.description);
+        picture = (Button)findViewById(R.id.picture) ;
+        img = (ImageView)findViewById(R.id.img1);
 
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -77,6 +91,15 @@ public class ContributeActivity extends AppCompatActivity {
             public void onProviderDisabled(String provider) {}
         };
 
+
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent,1);
+            }
+        });
         // Register the listener with the Location Manager to receive location updates
         //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
 
@@ -91,7 +114,10 @@ public class ContributeActivity extends AppCompatActivity {
                     data.put("lat",eLat.getText().toString());
                     data.put("long",eLong.getText().toString());
                     data.put("desc",eDesc.getText().toString());
+                    data.put("image",selectedImg);
 
+                    //Log.d("img",selectedImg);
+                   // data.put("image","testing abc");
 
                     JSONObject aaa;
                     aaa = callApi(lat,longt);
@@ -100,22 +126,14 @@ public class ContributeActivity extends AppCompatActivity {
                     JSONObject first = result.getJSONObject(0);
                     String address = first.getString("formatted_address");
 
-                    Log.d("address",address);
-
-                    String sample = address;
-                    sample = sample.replace(",", "");
-
+                  //  Log.d("address",address);
+                    String sample = address.replace(",", "");
                     String[] elements = sample.split(" ");
-                    for(String s :elements) {
-                      //  Log.d("a", s);
-                    }
+
 
                     String input = eAddress.getText().toString();
                     input = input.replace(",", "");
                     String[] inputs = input.split(" ");
-                    for(String a:inputs){
-                     //   Log.d("a", a);
-                    }
 
                     Boolean add = checkAddress(elements,inputs,elements.length);
 
@@ -124,12 +142,12 @@ public class ContributeActivity extends AppCompatActivity {
                     if(add)
                     {
                         Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                       // new PostData().execute(data);
+                        makeRequest(data.toString());
+                       // Log.d("result",makeRequest(data.toString()));
 
-                        new PostData().execute(data);
-                        // Post(data.toString());
                     }
                     else{
-
                         Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or you are not at the correct location",Toast.LENGTH_SHORT).show();
                     }
 
@@ -159,49 +177,52 @@ public class ContributeActivity extends AppCompatActivity {
         double rounded = Math.round((double)length/2);
         Log.d("round",String.valueOf(rounded) + "i is " + String.valueOf(i));
 
-        if(i >= rounded)
+        if(i >= rounded -1)
             return true;
         else
             return false;
     }
 
-    private boolean Post(String data){
-
-        HttpURLConnection httpcon;
-        String url = "https://powerful-escarpment-79209.herokuapp.com/api/place";
-        //String data = null;
+    public static String makeRequest(String json) {
+        HttpURLConnection urlConnection;
+        //String url;
+        String data = json;
         String result = null;
         try {
             //Connect
-            httpcon = (HttpURLConnection) ((new URL(url).openConnection()));
-            httpcon.setDoOutput(true);
-            // httpcon.setRequestProperty("Content-Type", "application/json");
-            httpcon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            httpcon.setRequestProperty("Accept", "application/json");
-            httpcon.setRequestMethod("POST");
-            httpcon.connect();
+            urlConnection = (HttpURLConnection) ((new URL("https://powerful-escarpment-79209.herokuapp.com/api/place").openConnection()));
+            urlConnection.setDoOutput(true);
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+            urlConnection.setRequestProperty("Accept", "application/json");
+            urlConnection.setRequestMethod("POST");
+            urlConnection.connect();
 
             //Write
-            OutputStream os = httpcon.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+            OutputStream outputStream = urlConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             writer.write(data);
             writer.close();
-            os.close();
+            outputStream.close();
 
-            Log.d("done","posted");
-            return true;
+            //Read
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "UTF-8"));
 
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+
+            while ((line = bufferedReader.readLine()) != null) {
+                sb.append(line);
+            }
+
+            bufferedReader.close();
+            result = sb.toString();
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return false;
-
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
-
         }
-
+        return result;
     }
 
     private JSONObject callApi(String lat,String longt) throws IOException {
@@ -272,19 +293,35 @@ public class ContributeActivity extends AppCompatActivity {
             JSONObject data;
             data = params[0];
 
+
+
           /*  try{
-                Log.d("name",data.getString("name"));
+                Log.d("data",data.getString("image"));
 
             }catch (Exception e)
             {
 
             }*/
+            String result = makeRequest(data.toString());
+            JSONObject resultobj;
+            try{
+                resultobj = new JSONObject(result);
+                //Log.d("result",resultobj.toString());
 
-            Boolean result = Post(data.toString());
+                if(data.getString("name").equalsIgnoreCase(resultobj.getString("name")) &&
+                data.getString("lat").equalsIgnoreCase(resultobj.getString("lat")) &&
+                data.getString("long").equalsIgnoreCase(resultobj.getString("long")) &&
+                data.getString("address").equalsIgnoreCase(resultobj.getString("address")))
+                {
+                    return true;
+                }
 
-            if(result){
-                return true;
+
+            }catch (Exception e)
+            {
+                e.printStackTrace();
             }
+
 
             return false;
         }
@@ -294,15 +331,47 @@ public class ContributeActivity extends AppCompatActivity {
             super.onPostExecute(aBoolean);
             if(aBoolean)
             {
-                Toast.makeText(getBaseContext(),"Successfully contributed",Toast.LENGTH_SHORT);
+                Toast.makeText(getBaseContext(),"Successfully contributed",Toast.LENGTH_SHORT).show();
             }
             else{
-                Toast.makeText(getBaseContext(),"Failed to contribute",Toast.LENGTH_SHORT);
+                Toast.makeText(getBaseContext(),"Something went wrong",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode == Activity.RESULT_OK) {
+
+            try{
+                InputStream inputStream = this.getContentResolver().openInputStream(data.getData());
+                selectedImage = BitmapFactory.decodeStream(inputStream);
+                img.setImageBitmap(selectedImage);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] b = baos.toByteArray();
+
+                selectedImg = Base64.encodeToString(b, Base64.DEFAULT); // for whole class use
+
+
+               /* byte[] decodedString = Base64.decode(encoded, Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);*/
+
+                //Log.d("encoded",encoded);
+
+
+
+            }catch (Exception e)
+            {
+                e.printStackTrace();
             }
 
 
         }
-    }
 
+
+    }
 }
