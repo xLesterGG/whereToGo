@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Looper;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -69,7 +70,6 @@ public class ContributeActivity extends AppCompatActivity {
                                 + loc.getLongitude(), Toast.LENGTH_SHORT).show();*/
                 eLat.setText(lat);
                 eLong.setText(longt);
-
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -78,7 +78,7 @@ public class ContributeActivity extends AppCompatActivity {
         };
 
         // Register the listener with the Location Manager to receive location updates
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
+        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,11 +117,22 @@ public class ContributeActivity extends AppCompatActivity {
                      //   Log.d("a", a);
                     }
 
-                    Boolean add = checkaddress(elements,inputs,elements.length);
+                    Boolean add = checkAddress(elements,inputs,elements.length);
 
-                    Toast.makeText(getBaseContext(),address,Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getBaseContext(),address,Toast.LENGTH_SHORT).show();
 
-                   // Post(data.toString());
+                    if(add)
+                    {
+                        Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+
+                        new PostData().execute(data);
+                        // Post(data.toString());
+                    }
+                    else{
+
+                        Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or you are not at the correct location",Toast.LENGTH_SHORT).show();
+                    }
+
 
                 }catch (Exception e){
                     e.printStackTrace();
@@ -130,7 +141,7 @@ public class ContributeActivity extends AppCompatActivity {
         });
     }
 
-    private boolean checkaddress(String[] address, String[] input,int length){
+    private boolean checkAddress(String[] address, String[] input,int length){
         int i = 0;
 
         for(String a:address)
@@ -146,7 +157,7 @@ public class ContributeActivity extends AppCompatActivity {
         }
 
         double rounded = Math.round((double)length/2);
-        Log.d("round",String.valueOf(rounded));
+        Log.d("round",String.valueOf(rounded) + "i is " + String.valueOf(i));
 
         if(i >= rounded)
             return true;
@@ -154,7 +165,7 @@ public class ContributeActivity extends AppCompatActivity {
             return false;
     }
 
-    private void Post(String data){
+    private boolean Post(String data){
 
         HttpURLConnection httpcon;
         String url = "https://powerful-escarpment-79209.herokuapp.com/api/place";
@@ -178,14 +189,18 @@ public class ContributeActivity extends AppCompatActivity {
             os.close();
 
             Log.d("done","posted");
+            return true;
 
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return false;
+
         } catch (IOException e) {
             e.printStackTrace();
-        }
+            return false;
 
+        }
 
     }
 
@@ -244,4 +259,50 @@ public class ContributeActivity extends AppCompatActivity {
         super.onPostResume();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
     }
+
+    class PostData extends AsyncTask<JSONObject,Boolean,Boolean>
+    {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(JSONObject... params) {
+            JSONObject data;
+            data = params[0];
+
+          /*  try{
+                Log.d("name",data.getString("name"));
+
+            }catch (Exception e)
+            {
+
+            }*/
+
+            Boolean result = Post(data.toString());
+
+            if(result){
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if(aBoolean)
+            {
+                Toast.makeText(getBaseContext(),"Successfully contributed",Toast.LENGTH_SHORT);
+            }
+            else{
+                Toast.makeText(getBaseContext(),"Failed to contribute",Toast.LENGTH_SHORT);
+
+            }
+
+
+        }
+    }
+
 }
