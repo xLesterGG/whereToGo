@@ -15,11 +15,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.http.params.HttpConnectionParams;
@@ -37,6 +47,9 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 public class ContributeActivity extends AppCompatActivity {
 
@@ -48,6 +61,7 @@ public class ContributeActivity extends AppCompatActivity {
     Bitmap selectedImage;
     ImageView img;
     String selectedImg = "";
+    TextView gps;
 
 
     @Override
@@ -68,6 +82,7 @@ public class ContributeActivity extends AppCompatActivity {
         eDesc= (EditText)findViewById(R.id.description);
         picture = (Button)findViewById(R.id.picture) ;
         img = (ImageView)findViewById(R.id.img1);
+        gps = (TextView)findViewById(R.id.gpsabc);
 
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -82,6 +97,7 @@ public class ContributeActivity extends AppCompatActivity {
                         getBaseContext(),
                         "Location changed: Lat: " + loc.getLatitude() + " Lng: "
                                 + loc.getLongitude(), Toast.LENGTH_SHORT).show();*/
+                gps.setText("Activated");
                 eLat.setText(lat);
                 eLong.setText(longt);
             }
@@ -139,11 +155,57 @@ public class ContributeActivity extends AppCompatActivity {
 
                    // Toast.makeText(getBaseContext(),address,Toast.LENGTH_SHORT).show();
 
+                    System.out.println("after compress:");
+                    //String compressed =
+                            compress(selectedImg);
+                  //  System.out.println(compressed);
+
                     if(add)
                     {
-                        Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                   /*     Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+
+                        final String url = "https://powerful-escarpment-79209.herokuapp.com/api/place";
+
+                        RequestQueue queue = Volley.newRequestQueue(getBaseContext());
+                        Map<String, String> jsonParams = new HashMap<String, String>();
+
+                        jsonParams.put("name", "abc");
+                        jsonParams.put("address", "def");
+                      //  jsonParams.put("image", "Abc");
+                        jsonParams.put("image", selectedImg);*/
+
+
+                     /*   JsonObjectRequest postRequest = new JsonObjectRequest( Request.Method.POST, url,
+
+                                new JSONObject(jsonParams),
+                                new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        Log.d("error",response.toString());
+
+                                    }
+                                },
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        //   Handle Error
+                                        Log.d("error",error.toString());
+                                    }
+                                }) {
+                            @Override
+                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                HashMap<String, String> headers = new HashMap<String, String>();
+                                headers.put("Content-Type", "application/json; charset=utf-8");
+                                headers.put("User-agent", System.getProperty("http.agent"));
+                                return headers;
+                            }
+                        };*/
+                      //  queue.add(postRequest);
+
+
+
                        // new PostData().execute(data);
-                        makeRequest(data.toString());
+                       // makeRequest(data.toString());
                        // Log.d("result",makeRequest(data.toString()));
 
                     }
@@ -158,6 +220,19 @@ public class ContributeActivity extends AppCompatActivity {
             }
         });
     }
+
+    public static byte[] compress(String str) throws Exception {
+
+        System.out.println("String length : " + str.length());
+        ByteArrayOutputStream obj=new ByteArrayOutputStream();
+        GZIPOutputStream gzip = new GZIPOutputStream(obj);
+        gzip.write(str.getBytes("UTF-8"));
+        gzip.close();
+        String outStr = obj.toString("UTF-8");
+        System.out.println("Output String length : " + outStr.length());
+        return obj.toByteArray();
+    }
+
 
     private boolean checkAddress(String[] address, String[] input,int length){
         int i = 0;
@@ -192,6 +267,7 @@ public class ContributeActivity extends AppCompatActivity {
             //Connect
             urlConnection = (HttpURLConnection) ((new URL("https://powerful-escarpment-79209.herokuapp.com/api/place").openConnection()));
             urlConnection.setDoOutput(true);
+           // urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Accept", "application/json");
             urlConnection.setRequestMethod("POST");
@@ -368,10 +444,7 @@ public class ContributeActivity extends AppCompatActivity {
             {
                 e.printStackTrace();
             }
-
-
         }
-
 
     }
 }

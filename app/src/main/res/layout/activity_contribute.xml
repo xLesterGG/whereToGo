@@ -106,7 +106,7 @@
         android:layout_height="wrap_content"
         android:ems="15"
         android:singleLine="false"
-        android:lines="3"
+        android:lines="2"
         android:gravity="bottom"
         android:id="@+id/description"
         />
@@ -122,6 +122,12 @@
         android:layout_height="100dp"
         android:id="@+id/img1"
         android:layout_gravity="center"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gpsabc"
+        android:text="aaa"/>
 
     <Button
         android:layout_width="wrap_content"
