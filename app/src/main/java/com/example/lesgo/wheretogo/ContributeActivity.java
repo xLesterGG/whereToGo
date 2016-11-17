@@ -152,7 +152,6 @@ public class ContributeActivity extends AppCompatActivity {
                     String[] inputs = input.split(" ");
 
                     Boolean add = checkAddress(elements,inputs,elements.length);
-
                    // Toast.makeText(getBaseContext(),address,Toast.LENGTH_SHORT).show();
 
                     System.out.println("after compress:");
@@ -162,7 +161,7 @@ public class ContributeActivity extends AppCompatActivity {
 
                     if(add)
                     {
-                   /*     Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                       Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
 
                         final String url = "https://powerful-escarpment-79209.herokuapp.com/api/place";
 
@@ -172,10 +171,10 @@ public class ContributeActivity extends AppCompatActivity {
                         jsonParams.put("name", "abc");
                         jsonParams.put("address", "def");
                       //  jsonParams.put("image", "Abc");
-                        jsonParams.put("image", selectedImg);*/
+                        jsonParams.put("image", selectedImg);
 
 
-                     /*   JsonObjectRequest postRequest = new JsonObjectRequest( Request.Method.POST, url,
+                        JsonObjectRequest postRequest = new JsonObjectRequest( Request.Method.POST, url,
 
                                 new JSONObject(jsonParams),
                                 new Response.Listener<JSONObject>() {
@@ -195,17 +194,19 @@ public class ContributeActivity extends AppCompatActivity {
                             @Override
                             public Map<String, String> getHeaders() throws AuthFailureError {
                                 HashMap<String, String> headers = new HashMap<String, String>();
+                               // headers.put("Content-Type", "application/json; charset=utf-8");
                                 headers.put("Content-Type", "application/json; charset=utf-8");
+
                                 headers.put("User-agent", System.getProperty("http.agent"));
+                                Log.d("headers",headers.toString());
                                 return headers;
                             }
-                        };*/
-                      //  queue.add(postRequest);
-
+                        };
+                   //     queue.add(postRequest);
 
 
                        // new PostData().execute(data);
-                       // makeRequest(data.toString());
+                        makeRequest(data.toString());
                        // Log.d("result",makeRequest(data.toString()));
 
                     }
@@ -427,16 +428,17 @@ public class ContributeActivity extends AppCompatActivity {
                 img.setImageBitmap(selectedImage);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                selectedImage.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+              //  selectedImage.compress
                 byte[] b = baos.toByteArray();
 
-                selectedImg = Base64.encodeToString(b, Base64.DEFAULT); // for whole class use
-
+                //selectedImg = Base64.encodeToString(b, Base64.DEFAULT); // for whole class use
+                selectedImg = Base64.encodeToString(b, Base64.NO_WRAP);
 
                /* byte[] decodedString = Base64.decode(encoded, Base64.DEFAULT);
                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);*/
 
-                //Log.d("encoded",encoded);
+                Log.d("encoded",selectedImg);
 
 
 
