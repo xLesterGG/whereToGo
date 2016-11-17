@@ -6,16 +6,25 @@ import android.graphics.Bitmap;
  * Created by lesgo on 11/13/2016.
  */
 public class Place {
-    String name,address,longi,lat,desc;
+    String name,address,longi,lat,desc,category;
     Bitmap img;
 
-    public Place(String name, String address, String longi, String lat, String desc,Bitmap image) {
+    public Place(String name, String address, String longi, String lat, String desc,Bitmap image,String cat) {
         this.name = name;
         this.address = address;
         this.longi = longi;
         this.lat = lat;
         this.desc = desc;
         this.img = image;
+        this.category = cat;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public Bitmap getImg() {

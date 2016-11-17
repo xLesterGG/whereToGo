@@ -44,18 +44,19 @@ public class SearchActivity extends AppCompatActivity {
             for(int i=0; i< alldata.length();i++){
                 JSONObject pointed = alldata.getJSONObject(i);
 
-                String name,address,longt,lat,desc,img;
+                String name,address,longt,lat,desc,img,category;
                 name= pointed.getString("name");
                 address = pointed.getString("address");
                 longt = pointed.getString("long");
                 lat = pointed.getString("lat");
                 desc = pointed.getString("desc");
                 img = pointed.getString("image");
+                category = pointed.getString("category");
 
                 byte[] decodedString = Base64.decode(img, Base64.NO_WRAP);
                 Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-                Place place = new Place(name,address,longt,lat,desc,decodedImg);
+                Place place = new Place(name,address,longt,lat,desc,decodedImg,category);
                 place_list.add(place);
 
                 //Log.d("title", pointed.getString("name"));

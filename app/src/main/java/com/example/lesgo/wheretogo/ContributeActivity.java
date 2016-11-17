@@ -17,9 +17,11 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +64,7 @@ public class ContributeActivity extends AppCompatActivity {
     ImageView img;
     String selectedImg = "";
     TextView gps;
+    Spinner spinner;
 
 
     @Override
@@ -83,6 +86,11 @@ public class ContributeActivity extends AppCompatActivity {
         picture = (Button)findViewById(R.id.picture) ;
         img = (ImageView)findViewById(R.id.img1);
         gps = (TextView)findViewById(R.id.gpsabc);
+        spinner = (Spinner)findViewById(R.id.planets_spinner);
+
+        String[] items = new String[]{"Restaurant","Shopping mall","Accomodation", "Local attractions"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        spinner.setAdapter(adapter);
 
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -131,6 +139,9 @@ public class ContributeActivity extends AppCompatActivity {
                     data.put("long",eLong.getText().toString());
                     data.put("desc",eDesc.getText().toString());
                     data.put("image",selectedImg.replace("=",""));
+                    data.put("category",spinner.getSelectedItem().toString());
+
+                    Log.d("aaa0",spinner.getSelectedItem().toString());
 
                     //Log.d("img",selectedImg);
                    // data.put("image","testing abc");
