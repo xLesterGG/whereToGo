@@ -130,7 +130,7 @@ public class ContributeActivity extends AppCompatActivity {
                     data.put("lat",eLat.getText().toString());
                     data.put("long",eLong.getText().toString());
                     data.put("desc",eDesc.getText().toString());
-                    data.put("image",selectedImg);
+                    data.put("image",selectedImg.replace("=",""));
 
                     //Log.d("img",selectedImg);
                    // data.put("image","testing abc");
@@ -146,67 +146,20 @@ public class ContributeActivity extends AppCompatActivity {
                     String sample = address.replace(",", "");
                     String[] elements = sample.split(" ");
 
-
                     String input = eAddress.getText().toString();
                     input = input.replace(",", "");
                     String[] inputs = input.split(" ");
 
                     Boolean add = checkAddress(elements,inputs,elements.length);
-                   // Toast.makeText(getBaseContext(),address,Toast.LENGTH_SHORT).show();
 
                     System.out.println("after compress:");
-                    //String compressed =
-                            compress(selectedImg);
-                  //  System.out.println(compressed);
 
                     if(add)
                     {
                        Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
 
-                        final String url = "https://powerful-escarpment-79209.herokuapp.com/api/place";
-
-                        RequestQueue queue = Volley.newRequestQueue(getBaseContext());
-                        Map<String, String> jsonParams = new HashMap<String, String>();
-
-                        jsonParams.put("name", "abc");
-                        jsonParams.put("address", "def");
-                      //  jsonParams.put("image", "Abc");
-                        jsonParams.put("image", selectedImg);
-
-
-                        JsonObjectRequest postRequest = new JsonObjectRequest( Request.Method.POST, url,
-
-                                new JSONObject(jsonParams),
-                                new Response.Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-                                        Log.d("error",response.toString());
-
-                                    }
-                                },
-                                new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        //   Handle Error
-                                        Log.d("error",error.toString());
-                                    }
-                                }) {
-                            @Override
-                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                HashMap<String, String> headers = new HashMap<String, String>();
-                               // headers.put("Content-Type", "application/json; charset=utf-8");
-                                headers.put("Content-Type", "application/json; charset=utf-8");
-
-                                headers.put("User-agent", System.getProperty("http.agent"));
-                                Log.d("headers",headers.toString());
-                                return headers;
-                            }
-                        };
-                   //     queue.add(postRequest);
-
-
-                       // new PostData().execute(data);
-                        makeRequest(data.toString());
+                        new PostData().execute(data);
+                        //makeRequest(data.toString());
                        // Log.d("result",makeRequest(data.toString()));
 
                     }
@@ -222,17 +175,7 @@ public class ContributeActivity extends AppCompatActivity {
         });
     }
 
-    public static byte[] compress(String str) throws Exception {
 
-        System.out.println("String length : " + str.length());
-        ByteArrayOutputStream obj=new ByteArrayOutputStream();
-        GZIPOutputStream gzip = new GZIPOutputStream(obj);
-        gzip.write(str.getBytes("UTF-8"));
-        gzip.close();
-        String outStr = obj.toString("UTF-8");
-        System.out.println("Output String length : " + outStr.length());
-        return obj.toByteArray();
-    }
 
 
     private boolean checkAddress(String[] address, String[] input,int length){
@@ -259,7 +202,7 @@ public class ContributeActivity extends AppCompatActivity {
             return false;
     }
 
-    public static String makeRequest(String json) {
+    public static String postRequest(String json) {
         HttpURLConnection urlConnection;
         //String url;
         String data = json;
@@ -370,16 +313,7 @@ public class ContributeActivity extends AppCompatActivity {
             JSONObject data;
             data = params[0];
 
-
-
-          /*  try{
-                Log.d("data",data.getString("image"));
-
-            }catch (Exception e)
-            {
-
-            }*/
-            String result = makeRequest(data.toString());
+            String result = postRequest(data.toString());
             JSONObject resultobj;
             try{
                 resultobj = new JSONObject(result);
@@ -398,7 +332,6 @@ public class ContributeActivity extends AppCompatActivity {
             {
                 e.printStackTrace();
             }
-
 
             return false;
         }
@@ -429,18 +362,11 @@ public class ContributeActivity extends AppCompatActivity {
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 selectedImage.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-              //  selectedImage.compress
-                byte[] b = baos.toByteArray();
 
-                //selectedImg = Base64.encodeToString(b, Base64.DEFAULT); // for whole class use
+                byte[] b = baos.toByteArray();
                 selectedImg = Base64.encodeToString(b, Base64.NO_WRAP);
 
-               /* byte[] decodedString = Base64.decode(encoded, Base64.DEFAULT);
-                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);*/
-
-                Log.d("encoded",selectedImg);
-
-
+                //Log.d("encoded",selectedImg);
 
             }catch (Exception e)
             {

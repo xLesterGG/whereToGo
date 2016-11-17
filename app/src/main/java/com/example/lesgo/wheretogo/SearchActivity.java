@@ -1,11 +1,14 @@
 package com.example.lesgo.wheretogo;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -41,15 +44,18 @@ public class SearchActivity extends AppCompatActivity {
             for(int i=0; i< alldata.length();i++){
                 JSONObject pointed = alldata.getJSONObject(i);
 
-                String name,address,longt,lat,desc;
+                String name,address,longt,lat,desc,img;
                 name= pointed.getString("name");
                 address = pointed.getString("address");
                 longt = pointed.getString("long");
                 lat = pointed.getString("lat");
                 desc = pointed.getString("desc");
+                img = pointed.getString("image");
 
-                Place place = new Place(name,address,longt,lat,desc);
+                byte[] decodedString = Base64.decode(img, Base64.NO_WRAP);
+                Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
+                Place place = new Place(name,address,longt,lat,desc,decodedImg);
                 place_list.add(place);
 
                 //Log.d("title", pointed.getString("name"));

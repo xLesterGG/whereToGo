@@ -1,11 +1,16 @@
 package com.example.lesgo.wheretogo;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -22,13 +27,16 @@ public class CustomAdapter  extends RecyclerView.Adapter<CustomAdapter.CustomVie
 
 
     public class CustomViewHolder extends RecyclerView.ViewHolder{
-        public TextView txtName, txtAddress;
+        public TextView txtName, txtAddress,txtCategory;
+        public ImageView imgView;
 
         public CustomViewHolder(View itemView){
             super(itemView);
 
             txtName = (TextView)itemView.findViewById(R.id.name);
             txtAddress = (TextView)itemView.findViewById(R.id.address);
+            txtCategory = (TextView)itemView.findViewById(R.id.category);
+            imgView = (ImageView)itemView.findViewById(R.id.picture);
 
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +72,7 @@ public class CustomAdapter  extends RecyclerView.Adapter<CustomAdapter.CustomVie
 
         holder.txtAddress.setText(m.getAddress());
         holder.txtName.setText(m.getName());
+        holder.imgView.setImageBitmap(m.getImg());
     }
 
     @Override

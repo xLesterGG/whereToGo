@@ -1,19 +1,29 @@
 package com.example.lesgo.wheretogo;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by lesgo on 11/13/2016.
  */
 public class Place {
     String name,address,longi,lat,desc;
+    Bitmap img;
 
-
-
-    public Place(String name, String address, String longi, String lat, String desc) {
+    public Place(String name, String address, String longi, String lat, String desc,Bitmap image) {
         this.name = name;
         this.address = address;
         this.longi = longi;
         this.lat = lat;
         this.desc = desc;
+        this.img = image;
+    }
+
+    public Bitmap getImg() {
+        return img;
+    }
+
+    public void setImg(Bitmap img) {
+        this.img = img;
     }
 
     public String getName() {
