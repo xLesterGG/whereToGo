@@ -1,7 +1,9 @@
 package com.example.lesgo.wheretogo;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,7 +40,7 @@ public class SearchActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         try{
-            int count = 0;
+
             JSONArray alldata= getAllPlaces();
 
             for(int i=0; i< alldata.length();i++){
@@ -56,7 +58,7 @@ public class SearchActivity extends AppCompatActivity {
                 byte[] decodedString = Base64.decode(img, Base64.NO_WRAP);
                 Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-                Place place = new Place(name,address,longt,lat,desc,decodedImg,category);
+                Place place = new Place(name,address,longt,lat,desc,decodedImg,category,img);
                 place_list.add(place);
 
                 //Log.d("title", pointed.getString("name"));
@@ -71,6 +73,20 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void OnItemClick(Place place) {
 
+                Intent intent = new Intent();
+                intent.setClass(getApplicationContext(),ShowPlaceActivity.class);
+                intent.putExtra("name",place.getName());
+                intent.putExtra("address",place.getAddress());
+                intent.putExtra("desc",place.getDesc());
+                intent.putExtra("category",place.getCategory());
+                intent.putExtra("image",place.getImgstring());
+                intent.putExtra("lat",place.getLat());
+                intent.putExtra("long",place.getLongi());
+
+
+                startActivity(intent);
+
+
             }
         });
 
@@ -83,7 +99,6 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-   // private JSONObject getAllPlaces() throws IOException {
     private JSONArray getAllPlaces() throws IOException {
 
         InputStream is = null;
@@ -127,5 +142,6 @@ public class SearchActivity extends AppCompatActivity {
         return obj;
 
     }
+
 
 }
