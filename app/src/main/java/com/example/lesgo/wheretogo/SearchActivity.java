@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,11 +26,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements SearchActivity.AsyncResponse{
 
     List<Place> place_list = new ArrayList<>();
     CustomAdapter adapter;
     RecyclerView recy_view;
+
+    JSONArray alldata;
+    getAll task = new getAll();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +42,11 @@ public class SearchActivity extends AppCompatActivity {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
+        task.delegate = this;
         try{
+            task.execute();
 
-            JSONArray alldata= getAllPlaces();
+            Log.d("aaa","aaa");
 
             for(int i=0; i< alldata.length();i++){
                 JSONObject pointed = alldata.getJSONObject(i);
@@ -89,9 +94,6 @@ public class SearchActivity extends AppCompatActivity {
 
                 intent.putExtra("id",place.getId());
                 intent.putExtra("comments",place.getComments().toString());
-
-              /*  Log.d("id", place.getId());
-                Log.d("comment",place.getComments().toString());*/
 
                 startActivity(intent);
 
@@ -152,5 +154,52 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void processFinish(JSONArray arr) {
+        alldata = arr;
+    }
+
+    class getAll extends AsyncTask<Void,JSONArray,JSONArray>
+    {
+        public AsyncResponse delegate = null;
+
+        JSONArray arr;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected JSONArray doInBackground(Void... params) {
+            try{
+                arr = getAllPlaces();
+
+                Log.d("length",String.valueOf(arr.length()));
+                if(arr.length()>0)
+                {
+                    return arr;
+                }
+
+
+            }catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray jsonArray) {
+            delegate.processFinish(jsonArray);
+        }
+
+
+    }
+
+    public interface AsyncResponse {
+        void processFinish(JSONArray arr);
+    }
 
 }
