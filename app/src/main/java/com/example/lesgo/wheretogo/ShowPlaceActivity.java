@@ -2,6 +2,7 @@ package com.example.lesgo.wheretogo;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -16,7 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -33,7 +36,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
     TextView name,category,address,desc;
     ImageView img;
     Bundle bundle;
-    EditText commen;
+    EditText commen,username;
     JSONArray comments;
     Button addcomment;
     String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray;
@@ -51,6 +54,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         img  = (ImageView)findViewById(R.id.image);
         commen = (EditText)findViewById(R.id.comment);
         addcomment = (Button)findViewById(R.id.submitcomment);
+        username = (EditText)findViewById(R.id.username);
 
 
         bundle = getIntent().getExtras();
@@ -103,9 +107,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                     JSONObject data = new JSONObject();
                     try{
-                        //data.put("name", namestr);
-                        data.put("name", "fuck");
-
+                        data.put("name", namestr);
                         data.put("address",addr);
                         data.put("lat",latitude);
                         data.put("long",longtitude);
@@ -120,34 +122,27 @@ public class ShowPlaceActivity extends AppCompatActivity {
                         JSONObject comment = new JSONObject();
                         comment.put("rating",spinner.getSelectedItem().toString());
                         comment.put("comment",commen.getText().toString());
+                        comment.put("username",username.getText().toString());
 
 
                         comments.put(comment);
 
                         data.put("comments",comments);
 
-                        Log.d("aaaaaa",spinner.getSelectedItem().toString() + "    " + commen.getText().toString() );
-                        Log.d("aaaaaa",comments.toString() );
+                       // Log.d("aaaaaa",spinner.getSelectedItem().toString() + "    " + commen.getText().toString() );
+                        //Log.d("aaaaaa",comments.toString() );
 
-                        postComment(data.toString(),id);
+                       TaskParams param = new TaskParams(data,id);
+                       new postCom().execute(param);
+                      //  postComment(data.toString(),id);
 
-                        Toast.makeText(getBaseContext(),"posted",Toast.LENGTH_SHORT);
+                       // Toast.makeText(getBaseContext(),"posted",Toast.LENGTH_SHORT);
 
 
                     }catch(Exception e)
                     {
                         e.printStackTrace();
                     }
-
-                    /*
-                     JSONObject json= new JSONObject() ;
-
-                        json.put("rating","1");
-                        json.put("comment","defff");
-                        JSONArray bbb= new JSONArray();
-
-                        bbb.put(json);
-                    */
 
                 }
 
@@ -199,5 +194,65 @@ public class ShowPlaceActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return result;
+    }
+
+    private static class TaskParams{
+        JSONObject json;
+        String id;
+
+        public TaskParams(JSONObject json, String id) {
+            this.json = json;
+            this.id = id;
+        }
+    }
+
+    class postCom extends AsyncTask<TaskParams,Boolean,Boolean>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(TaskParams... params) {
+            TaskParams paramobj = params[0];
+
+            String result = postComment(paramobj.json.toString(),paramobj.id);
+            //return true;
+            try{
+                JSONObject returned =  new JSONObject(result);
+                //Log.d("return",returned.toString());
+
+                returned.remove("_id");
+                returned.remove("image"); // remove irrelevent data for comparison
+                returned.remove("__v");
+
+                JSONObject original = paramobj.json;
+                original.remove("image"); // image encoding seems to change on put requests, but
+                                            //decoded image stays the same. removed from comparison
+
+                JSONAssert.assertEquals(returned,original,true); // check if same
+                return true;
+
+            }catch (JSONException e)
+            {
+                return false;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+
+            if(aBoolean)
+            {
+                Toast.makeText(getBaseContext(),"Successfully commented",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(getBaseContext(),"Something went wrong,please try again later",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
