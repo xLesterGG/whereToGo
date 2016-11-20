@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity implements SearchActivity.AsyncResponse{
+public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
     List<Place> place_list = new ArrayList<>();
     CustomAdapter adapter;
@@ -42,11 +42,14 @@ public class SearchActivity extends AppCompatActivity implements SearchActivity.
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        task.delegate = this;
-        try{
-            task.execute();
+       /* task.delegate = this;
+        task.execute();*/
 
-            Log.d("aaa","aaa");
+
+        try{
+            alldata = getAllPlaces();
+            Log.d("hereabc","FUCK");
+
 
             for(int i=0; i< alldata.length();i++){
                 JSONObject pointed = alldata.getJSONObject(i);
@@ -156,7 +159,8 @@ public class SearchActivity extends AppCompatActivity implements SearchActivity.
 
     @Override
     public void processFinish(JSONArray arr) {
-        alldata = arr;
+        //alldata = arr;
+       // Log.d("arrr",alldata.toString());
     }
 
     class getAll extends AsyncTask<Void,JSONArray,JSONArray>
@@ -198,8 +202,6 @@ public class SearchActivity extends AppCompatActivity implements SearchActivity.
 
     }
 
-    public interface AsyncResponse {
-        void processFinish(JSONArray arr);
-    }
+
 
 }
