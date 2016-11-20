@@ -2,14 +2,17 @@ package com.example.lesgo.wheretogo;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONArray;
+
 /**
  * Created by lesgo on 11/13/2016.
  */
 public class Place {
-    String name,address,longi,lat,desc,category,imgstring;
+    String name,address,longi,lat,desc,category,imgstring,id;
     Bitmap img;
+    JSONArray comments;
 
-    public Place(String name, String address, String longi, String lat, String desc,Bitmap image,String cat,String imagestring) {
+    public Place(String name, String address, String longi, String lat, String desc,Bitmap image,String cat,String imagestring,JSONArray com, String idee) {
         this.name = name;
         this.address = address;
         this.longi = longi;
@@ -18,6 +21,24 @@ public class Place {
         this.img = image;
         this.category = cat;
         this.imgstring = imagestring;
+        this.comments = com;
+        this.id = idee;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public JSONArray getComments() {
+        return comments;
+    }
+
+    public void setComments(JSONArray comments) {
+        this.comments = comments;
     }
 
     public String getImgstring() {

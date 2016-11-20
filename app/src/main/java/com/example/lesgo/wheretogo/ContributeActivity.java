@@ -116,6 +116,24 @@ public class ContributeActivity extends AppCompatActivity {
         };
 
 
+      // JSONArray bbb= new JSONArray();
+        try{
+
+            JSONObject json= new JSONObject() ;
+
+            json.put("name","abc");
+            json.put("comment","def");
+            JSONArray bbb= new JSONArray(json);
+
+
+
+
+        }catch(Exception e){
+
+        }
+      //  Log.d("aaa0",json.toString());
+
+
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,7 +159,16 @@ public class ContributeActivity extends AppCompatActivity {
                     data.put("image",selectedImg.replace("=",""));
                     data.put("category",spinner.getSelectedItem().toString());
 
-                    Log.d("aaa0",spinner.getSelectedItem().toString());
+
+                  /*  JSONObject json= new JSONObject() ;
+                    json.put("rating","1");
+                    json.put("comment","defff");
+                    JSONArray bbb= new JSONArray();
+
+                    bbb.put(json);
+                    data.put("comments",bbb);*/
+
+
 
                     //Log.d("img",selectedImg);
                    // data.put("image","testing abc");
@@ -355,7 +382,7 @@ public class ContributeActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(),"Successfully contributed",Toast.LENGTH_SHORT).show();
             }
             else{
-                Toast.makeText(getBaseContext(),"Something went wrong",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(),"Something went wrong,please try again later",Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -364,7 +391,7 @@ public class ContributeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1 && resultCode == Activity.RESULT_OK) {
+        if(requestCode == 1 && resultCode == Activity.RESULT_OK) { // picking image from gallery
 
             try{
                 InputStream inputStream = this.getContentResolver().openInputStream(data.getData());

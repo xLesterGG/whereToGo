@@ -45,8 +45,9 @@ public class SearchActivity extends AppCompatActivity {
 
             for(int i=0; i< alldata.length();i++){
                 JSONObject pointed = alldata.getJSONObject(i);
+                JSONArray comments;
 
-                String name,address,longt,lat,desc,img,category;
+                String name,address,longt,lat,desc,img,category,id;
                 name= pointed.getString("name");
                 address = pointed.getString("address");
                 longt = pointed.getString("long");
@@ -55,10 +56,13 @@ public class SearchActivity extends AppCompatActivity {
                 img = pointed.getString("image");
                 category = pointed.getString("category");
 
+                comments = pointed.getJSONArray("comments");
+                id = pointed.getString("_id");
+
                 byte[] decodedString = Base64.decode(img, Base64.NO_WRAP);
                 Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 
-                Place place = new Place(name,address,longt,lat,desc,decodedImg,category,img);
+                Place place = new Place(name,address,longt,lat,desc,decodedImg,category,img,comments,id);
                 place_list.add(place);
 
                 //Log.d("title", pointed.getString("name"));
@@ -83,6 +87,11 @@ public class SearchActivity extends AppCompatActivity {
                 intent.putExtra("lat",place.getLat());
                 intent.putExtra("long",place.getLongi());
 
+                intent.putExtra("id",place.getId());
+                intent.putExtra("comments",place.getComments().toString());
+
+              /*  Log.d("id", place.getId());
+                Log.d("comment",place.getComments().toString());*/
 
                 startActivity(intent);
 
