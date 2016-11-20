@@ -5,6 +5,9 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +33,8 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShowPlaceActivity extends AppCompatActivity {
 
@@ -41,6 +46,11 @@ public class ShowPlaceActivity extends AppCompatActivity {
     Button addcomment;
     String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray;
     Spinner spinner;
+
+    RecyclerView recy_view;
+    CommentsAdapter adapter1;
+
+    List<Comment> comment_list = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +88,33 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
 
         try{
-            comments = new JSONArray(commentarray);
+            comments = new JSONArray(commentarray); // convert string to json
+
+            for(int i=0;i<comments.length();i++)
+            {
+                JSONObject comment = comments.getJSONObject(i);
+
+                String name,com,rating;
+
+                name = comment.getString("username");
+                com = comment.getString("comment");
+                rating = comment.getString("rating");
+
+                Comment c = new Comment(com,name,rating);
+                comment_list.add(c);
+
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        adapter1 = new CommentsAdapter(comment_list);
+
+        recy_view = (RecyclerView)findViewById(R.id.recyclerview);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recy_view.setLayoutManager(layoutManager);
+        recy_view.setItemAnimator(new DefaultItemAnimator());
+        recy_view.setAdapter(adapter1);
 
 
         byte[] decodedString = Base64.decode(imgencoded, Base64.NO_WRAP);

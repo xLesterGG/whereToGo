@@ -15,10 +15,18 @@ import java.util.List;
  */
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.CustomViewHolder>  {
 
+    private List<Comment> comment_list;
+    public CommentsAdapter(List<Comment> list){comment_list = list;}
+
     public class CustomViewHolder extends RecyclerView.ViewHolder{
+        public TextView txtcomment,txtname,txtrating;
+        public ImageView imgView;
 
         public CustomViewHolder(View itemView){
             super(itemView);
+            txtcomment = (TextView)itemView.findViewById(R.id.comment);
+            txtname = (TextView)itemView.findViewById(R.id.username);
+            txtrating = (TextView)itemView.findViewById(R.id.rating);
         }
     }
 
@@ -33,11 +41,22 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Custom
 
     @Override
     public void onBindViewHolder(CustomViewHolder holder, int position) {
+        Comment c = comment_list.get(position);
+        holder.txtcomment.setText(c.getComment());
+        holder.txtname.setText(c.getUsername());
+        holder.txtrating.setText(c.getRating());
 
     }
 
     @Override
     public int getItemCount() {
-        return 1;
+        if(comment_list!=null){
+            return comment_list.size();
+        }
+        else
+        {
+            return 0;
+        }
+
     }
 }
