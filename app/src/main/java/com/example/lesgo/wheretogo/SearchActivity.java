@@ -42,13 +42,13 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-       /* task.delegate = this;
+        /*task.delegate = this;
+
         task.execute();*/
 
 
         try{
             alldata = getAllPlaces();
-            Log.d("hereabc","FUCK");
 
 
             for(int i=0; i< alldata.length();i++){
@@ -159,8 +159,7 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
     @Override
     public void processFinish(JSONArray arr) {
-        //alldata = arr;
-       // Log.d("arrr",alldata.toString());
+        alldata = arr;
     }
 
     class getAll extends AsyncTask<Void,JSONArray,JSONArray>
