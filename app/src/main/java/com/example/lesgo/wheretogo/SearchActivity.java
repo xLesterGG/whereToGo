@@ -1,5 +1,7 @@
 package com.example.lesgo.wheretogo;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,9 +33,12 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
     List<Place> place_list = new ArrayList<>();
     CustomAdapter adapter;
     RecyclerView recy_view;
-
     JSONArray alldata;
     getAll task = new getAll();
+
+    public static final int SPINNER = 2;
+    private ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,75 +47,22 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        /*task.delegate = this;
+        task.delegate = this;
 
-        task.execute();*/
-
-
-        try{
-            alldata = getAllPlaces();
+        task.execute();
+    }
 
 
-            for(int i=0; i< alldata.length();i++){
-                JSONObject pointed = alldata.getJSONObject(i);
-                JSONArray comments;
+    @Override
+    protected Dialog onCreateDialog(int id) {
 
-                String name,address,longt,lat,desc,img,category,id;
-                name= pointed.getString("name");
-                address = pointed.getString("address");
-                longt = pointed.getString("long");
-                lat = pointed.getString("lat");
-                desc = pointed.getString("desc");
-                img = pointed.getString("image");
-                category = pointed.getString("category");
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Getting available places...");
 
-                comments = pointed.getJSONArray("comments");
-                id = pointed.getString("_id");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
 
-                byte[] decodedString = Base64.decode(img, Base64.NO_WRAP);
-                Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                Place place = new Place(name,address,longt,lat,desc,decodedImg,category,img,comments,id);
-                place_list.add(place);
-
-                //Log.d("title", pointed.getString("name"));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        adapter = new CustomAdapter(place_list);
-        adapter.setOnItemClickListener(new CustomAdapter.OnItemClickListener() {
-            @Override
-            public void OnItemClick(Place place) {
-
-                Intent intent = new Intent();
-                intent.setClass(getApplicationContext(),ShowPlaceActivity.class);
-                intent.putExtra("name",place.getName());
-                intent.putExtra("address",place.getAddress());
-                intent.putExtra("desc",place.getDesc());
-                intent.putExtra("category",place.getCategory());
-                intent.putExtra("image",place.getImgstring());
-                intent.putExtra("lat",place.getLat());
-                intent.putExtra("long",place.getLongi());
-
-                intent.putExtra("id",place.getId());
-                intent.putExtra("comments",place.getComments().toString());
-
-                startActivity(intent);
-
-
-            }
-        });
-
-        recy_view = (RecyclerView)findViewById(R.id.recyclerview);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recy_view.setLayoutManager(layoutManager);
-        recy_view.setItemAnimator(new DefaultItemAnimator());
-        recy_view.setAdapter(adapter);
-
-
+        return progressDialog;
     }
 
     private JSONArray getAllPlaces() throws IOException {
@@ -160,6 +112,73 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
     @Override
     public void processFinish(JSONArray arr) {
         alldata = arr;
+        Log.d("length",String.valueOf(alldata.length()));
+
+        try{
+            if(arr!=null)
+            {
+                for(int i=0; i< alldata.length();i++){
+                    JSONObject pointed = alldata.getJSONObject(i);
+                    JSONArray comments;
+
+                    String name,address,longt,lat,desc,img,category,id;
+                    name= pointed.getString("name");
+                    address = pointed.getString("address");
+                    longt = pointed.getString("long");
+                    lat = pointed.getString("lat");
+                    desc = pointed.getString("desc");
+                    img = pointed.getString("image");
+                    category = pointed.getString("category");
+
+                    comments = pointed.getJSONArray("comments");
+                    id = pointed.getString("_id");
+
+                    byte[] decodedString = Base64.decode(img, Base64.NO_WRAP);
+                    Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+                    Place place = new Place(name,address,longt,lat,desc,decodedImg,category,img,comments,id);
+                    place_list.add(place);
+
+                    //Log.d("title", pointed.getString("name"));
+                }
+            }
+
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        adapter = new CustomAdapter(place_list);
+        adapter.setOnItemClickListener(new CustomAdapter.OnItemClickListener() {
+            @Override
+            public void OnItemClick(Place place) {
+
+                Intent intent = new Intent();
+                intent.setClass(getApplicationContext(),ShowPlaceActivity.class);
+                intent.putExtra("name",place.getName());
+                intent.putExtra("address",place.getAddress());
+                intent.putExtra("desc",place.getDesc());
+                intent.putExtra("category",place.getCategory());
+                intent.putExtra("image",place.getImgstring());
+                intent.putExtra("lat",place.getLat());
+                intent.putExtra("long",place.getLongi());
+
+                intent.putExtra("id",place.getId());
+                intent.putExtra("comments",place.getComments().toString());
+
+                startActivity(intent);
+
+
+            }
+        });
+
+        recy_view = (RecyclerView)findViewById(R.id.recyclerview);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recy_view.setLayoutManager(layoutManager);
+        recy_view.setItemAnimator(new DefaultItemAnimator());
+        recy_view.setAdapter(adapter);
+
     }
 
     class getAll extends AsyncTask<Void,JSONArray,JSONArray>
@@ -171,6 +190,7 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            showDialog(SPINNER);
         }
 
         @Override
@@ -195,6 +215,7 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
+            dismissDialog(SPINNER);
             delegate.processFinish(jsonArray);
         }
 
