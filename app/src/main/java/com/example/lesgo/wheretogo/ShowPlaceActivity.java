@@ -3,6 +3,7 @@ package com.example.lesgo.wheretogo;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ShowPlaceActivity extends AppCompatActivity {
 
@@ -119,14 +122,22 @@ public class ShowPlaceActivity extends AppCompatActivity {
         recy_view.setAdapter(adapter1);
 
 
-        byte[] decodedString = Base64.decode(imgencoded, Base64.NO_WRAP);
-        Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        if(imgencoded.equalsIgnoreCase(""))
+        {
+            //img.setImageResource(R.drawable.noimg);
+           // img.setBackgroundColor(Color.TRANSPARENT);
+        }
+        else{
+            byte[] decodedString = Base64.decode(imgencoded, Base64.NO_WRAP);
+            Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            img.setImageBitmap(decodedImg);
+        }
+
 
         name.setText(namestr);
         category.setText(categorystr);
         address.setText(addr);
         desc.setText(descstr);
-        img.setImageBitmap(decodedImg);
 
 
         addcomment.setOnClickListener(new View.OnClickListener() {
@@ -173,30 +184,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                        // Toast.makeText(getBaseContext(),"posted",Toast.LENGTH_SHORT);
 
-                        // to refresh activity
 
-                        finish();
-                        overridePendingTransition(0, 0);
-                        JSONObject updated = getOnePlace(id);
-
-                        Intent intent1 = new Intent();
-                        intent1.setClass(getApplicationContext(),ShowPlaceActivity.class);
-
-                        intent1.putExtra("name",updated.getString("name"));
-                        intent1.putExtra("address",updated.getString("address"));
-                        intent1.putExtra("desc",updated.getString("desc"));
-                        intent1.putExtra("category",updated.getString("category"));
-                        intent1.putExtra("image",updated.getString("image"));
-                        intent1.putExtra("lat",updated.getString("lat"));
-                        intent1.putExtra("long",updated.getString("long"));
-
-                        intent1.putExtra("id",updated.getString("_id"));
-                        intent1.putExtra("comments",updated.getString("comments"));
-
-
-                        intent1.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        startActivity(intent1);
-                        //Log.d("abcde",updated.getString("category"));
 
 
                     }catch(Exception e)
@@ -332,6 +320,33 @@ public class ShowPlaceActivity extends AppCompatActivity {
             if(aBoolean)
             {
                 Toast.makeText(getBaseContext(),"Successfully commented",Toast.LENGTH_SHORT).show();
+
+                try{ // refresh data
+
+                    JSONObject updated = getOnePlace(id);
+
+                    Intent intent1 = new Intent();
+                    intent1.setClass(getApplicationContext(),ShowPlaceActivity.class);
+
+                    intent1.putExtra("name",updated.getString("name"));
+                    intent1.putExtra("address",updated.getString("address"));
+                    intent1.putExtra("desc",updated.getString("desc"));
+                    intent1.putExtra("category",updated.getString("category"));
+                    intent1.putExtra("image",updated.getString("image"));
+                    intent1.putExtra("lat",updated.getString("lat"));
+                    intent1.putExtra("long",updated.getString("long"));
+
+                    intent1.putExtra("id",updated.getString("_id"));
+                    intent1.putExtra("comments",updated.getString("comments"));
+
+                    finish();
+                    overridePendingTransition(0, 0);
+
+                    intent1.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent1);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
             else{
                 Toast.makeText(getBaseContext(),"Something went wrong,please try again later",Toast.LENGTH_SHORT).show();

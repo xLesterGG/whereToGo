@@ -2,11 +2,17 @@ package com.example.lesgo.wheretogo;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -14,6 +20,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -30,7 +39,7 @@ import java.util.List;
 
 public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
-    List<Place> place_list = new ArrayList<>();
+
     CustomAdapter adapter;
     RecyclerView recy_view;
     JSONArray alldata;
@@ -114,7 +123,24 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
         alldata = arr;
         Log.d("length",String.valueOf(alldata.length()));
 
-        try{
+
+        // Get the ViewPager and set it's PagerAdapter so that it can display items
+        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        PagerAdapter pagerAdapter =
+                new PagerAdapter(getSupportFragmentManager(), SearchActivity.this,alldata);
+        viewPager.setAdapter(pagerAdapter);
+
+        // Give the TabLayout the ViewPager
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
+
+        // Iterate over all tabs and set the custom view
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            tab.setCustomView(pagerAdapter.getTabView(i));
+        }
+
+       /* try{
             if(arr!=null)
             {
                 for(int i=0; i< alldata.length();i++){
@@ -177,7 +203,7 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recy_view.setLayoutManager(layoutManager);
         recy_view.setItemAnimator(new DefaultItemAnimator());
-        recy_view.setAdapter(adapter);
+        recy_view.setAdapter(adapter);*/
 
     }
 
@@ -219,6 +245,70 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
             delegate.processFinish(jsonArray);
         }
 
+
+    }
+
+    class PagerAdapter extends FragmentPagerAdapter {
+
+        String tabTitles[] = new String[] { "Restaurant", "Accomodation", "Local attractions"};
+        Context context;
+        JSONArray ar;
+
+        public PagerAdapter(FragmentManager fm, Context context,JSONArray arr) {
+            super(fm);
+            this.context = context;
+            this.ar = arr;
+        }
+
+        @Override
+        public int getCount() {
+            return tabTitles.length;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+
+
+            switch (position) {
+                case 0:
+                    Bundle arg = new Bundle();
+                    arg.putString("data",ar.toString());
+                    arg.putString("id","1");
+                    BlankFragment a = new BlankFragment();
+                    a.setArguments(arg);
+                    return a;
+                case 1:
+                    Bundle arg1 = new Bundle();
+                    arg1.putString("data",ar.toString());
+                    arg1.putString("id","2");
+                    BlankFragment b = new BlankFragment();
+                    b.setArguments(arg1);
+                    return b;
+                case 2:
+                    Bundle arg2 = new Bundle();
+                    arg2.putString("data",ar.toString());
+                    arg2.putString("id","3");
+                    BlankFragment c = new BlankFragment();
+                    c.setArguments(arg2);
+                    return c;
+            }
+
+            return null;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            // Generate title based on item position
+            return tabTitles[position];
+        }
+
+        public View getTabView(int position) {
+            View tab = LayoutInflater.from(SearchActivity.this).inflate(R.layout.custom_tab, null);
+            TextView tv = (TextView) tab.findViewById(R.id.custom_text);
+            tv.setText(tabTitles[position]);
+            return tab;
+        }
 
     }
 
