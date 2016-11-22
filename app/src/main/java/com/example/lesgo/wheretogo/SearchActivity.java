@@ -39,9 +39,6 @@ import java.util.List;
 
 public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
-
-    CustomAdapter adapter;
-    RecyclerView recy_view;
     JSONArray alldata;
     getAll task = new getAll();
 
@@ -139,71 +136,6 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             tab.setCustomView(pagerAdapter.getTabView(i));
         }
-
-       /* try{
-            if(arr!=null)
-            {
-                for(int i=0; i< alldata.length();i++){
-                    JSONObject pointed = alldata.getJSONObject(i);
-                    JSONArray comments;
-
-                    String name,address,longt,lat,desc,img,category,id;
-                    name= pointed.getString("name");
-                    address = pointed.getString("address");
-                    longt = pointed.getString("long");
-                    lat = pointed.getString("lat");
-                    desc = pointed.getString("desc");
-                    img = pointed.getString("image");
-                    category = pointed.getString("category");
-
-                    comments = pointed.getJSONArray("comments");
-                    id = pointed.getString("_id");
-
-                    byte[] decodedString = Base64.decode(img, Base64.NO_WRAP);
-                    Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                    Place place = new Place(name,address,longt,lat,desc,decodedImg,category,img,comments,id);
-                    place_list.add(place);
-
-                    //Log.d("title", pointed.getString("name"));
-                }
-            }
-
-
-        }catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        adapter = new CustomAdapter(place_list);
-        adapter.setOnItemClickListener(new CustomAdapter.OnItemClickListener() {
-            @Override
-            public void OnItemClick(Place place) {
-
-                Intent intent = new Intent();
-                intent.setClass(getApplicationContext(),ShowPlaceActivity.class);
-                intent.putExtra("name",place.getName());
-                intent.putExtra("address",place.getAddress());
-                intent.putExtra("desc",place.getDesc());
-                intent.putExtra("category",place.getCategory());
-                intent.putExtra("image",place.getImgstring());
-                intent.putExtra("lat",place.getLat());
-                intent.putExtra("long",place.getLongi());
-
-                intent.putExtra("id",place.getId());
-                intent.putExtra("comments",place.getComments().toString());
-
-                startActivity(intent);
-
-
-            }
-        });
-
-        recy_view = (RecyclerView)findViewById(R.id.recyclerview);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        recy_view.setLayoutManager(layoutManager);
-        recy_view.setItemAnimator(new DefaultItemAnimator());
-        recy_view.setAdapter(adapter);*/
 
     }
 

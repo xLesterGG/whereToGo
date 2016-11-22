@@ -1,7 +1,9 @@
 package com.example.lesgo.wheretogo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -53,7 +55,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
-public class ContributeActivity extends AppCompatActivity {
+public class ContributeActivity extends AppCompatActivity{
 
     Button submit,picture;
     EditText eName,eAddress,eLat,eLong,eDesc;
@@ -65,6 +67,10 @@ public class ContributeActivity extends AppCompatActivity {
     String selectedImg = "";
     TextView gps;
     Spinner spinner;
+    int errorcount;
+    AlertDialog.Builder builder1;
+
+    PostData asyncTask =new PostData();
 
 
     @Override
@@ -75,6 +81,7 @@ public class ContributeActivity extends AppCompatActivity {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
 
         submit = (Button)findViewById(R.id.submit);
         eName = (EditText)findViewById(R.id.name);
@@ -87,6 +94,8 @@ public class ContributeActivity extends AppCompatActivity {
         img = (ImageView)findViewById(R.id.img1);
         gps = (TextView)findViewById(R.id.gpsabc);
         spinner = (Spinner)findViewById(R.id.planets_spinner);
+
+        builder1 = new AlertDialog.Builder(this);
 
         String[] items = new String[]{"Restaurant","Shopping mall","Accomodation", "Local attractions"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
@@ -116,24 +125,6 @@ public class ContributeActivity extends AppCompatActivity {
         };
 
 
-      // JSONArray bbb= new JSONArray();
-        try{
-
-            JSONObject json= new JSONObject() ;
-
-            json.put("name","abc");
-            json.put("comment","def");
-            JSONArray bbb= new JSONArray(json);
-
-
-
-
-        }catch(Exception e){
-
-        }
-      //  Log.d("aaa0",json.toString());
-
-
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,71 +139,104 @@ public class ContributeActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JSONObject data = new JSONObject();
+                final JSONObject data = new JSONObject();
 
-                try{
-                    data.put("name", eName.getText().toString());
-                    data.put("address",eAddress.getText().toString());
-                    data.put("lat",eLat.getText().toString());
-                    data.put("long",eLong.getText().toString());
-                    data.put("desc",eDesc.getText().toString());
-                    data.put("image",selectedImg.replace("=",""));
-                    data.put("category",spinner.getSelectedItem().toString());
-
-
-                  /*  JSONObject json= new JSONObject() ;
-                    json.put("rating","1");
-                    json.put("comment","defff");
-                    JSONArray bbb= new JSONArray();
-
-                    bbb.put(json);
-                    data.put("comments",bbb);*/
+                if(eName.getText().toString().equalsIgnoreCase("") || eAddress.getText().toString().equalsIgnoreCase("")
+                        || eDesc.getText().toString().equalsIgnoreCase(""))
+                {
+                    Toast.makeText(getBaseContext(),"Please fill in all the details before submitting",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    try{
+                        data.put("name", eName.getText().toString());
+                        data.put("address",eAddress.getText().toString());
+                        data.put("lat",eLat.getText().toString());
+                        data.put("long",eLong.getText().toString());
+                        data.put("desc",eDesc.getText().toString());
+                        data.put("image",selectedImg.replace("=",""));
+                        data.put("category",spinner.getSelectedItem().toString());
 
 
+                        JSONObject aaa;
+                        aaa = callApi(lat,longt);
 
-                    //Log.d("img",selectedImg);
-                   // data.put("image","testing abc");
+                        JSONArray result = aaa.getJSONArray("results");
+                        JSONObject first = result.getJSONObject(0);
+                        String address = first.getString("formatted_address");
 
-                    JSONObject aaa;
-                    aaa = callApi(lat,longt);
+                        //  Log.d("address",address);
+                        String sample = address.replace(",", "");
+                        String[] elements = sample.split(" ");
 
-                    JSONArray result = aaa.getJSONArray("results");
-                    JSONObject first = result.getJSONObject(0);
-                    String address = first.getString("formatted_address");
+                        String input = eAddress.getText().toString();
+                        input = input.replace(",", "");
+                        String[] inputs = input.split(" ");
 
-                  //  Log.d("address",address);
-                    String sample = address.replace(",", "");
-                    String[] elements = sample.split(" ");
+                        Boolean add = checkAddress(elements,inputs,elements.length);
 
-                    String input = eAddress.getText().toString();
-                    input = input.replace(",", "");
-                    String[] inputs = input.split(" ");
 
-                    Boolean add = checkAddress(elements,inputs,elements.length);
+                        if(add)
+                        {
 
-                    System.out.println("after compress:");
+                            if(selectedImg.equalsIgnoreCase(""))
+                            {
+                                builder1.setTitle("Confirm submission");
+                                builder1.setMessage("Are you sure you want to continue without adding an image");
+                                builder1.setCancelable(true);
 
-                    if(add)
-                    {
-                       Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                builder1.setPositiveButton(
+                                        "Yes",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int ida) {
+                                                Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                                //new PostData().execute(data);
+                                                //execute the async task
+                                                asyncTask.execute(data);
+                                                errorcount =0;
+                                                dialog.cancel();
+                                            }
+                                        });
 
-                        new PostData().execute(data);
-                        //makeRequest(data.toString());
-                       // Log.d("result",makeRequest(data.toString()));
+                                builder1.setNegativeButton(
+                                        "No",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                dialog.cancel();
+                                            }
+                                        });
 
+                                AlertDialog alert11 = builder1.create();
+                                alert11.show();
+
+                            }
+                            else{
+                                Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                new PostData().execute(data);
+                                errorcount =0;
+                            }
+                        }
+                        else{
+                            errorcount+=1;
+                            if(errorcount>5)
+                            {
+                                Toast.makeText(getBaseContext(),"You seem to not know your the accurate address of your location. " +
+                                        "Please get the accurate address before trying again",Toast.LENGTH_SHORT).show();
+
+                            }
+                            else{
+                                Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or " +
+                                        "you are not at the correct location",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                    else{
-                        Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or you are not at the correct location",Toast.LENGTH_SHORT).show();
-                    }
-
-
-                }catch (Exception e){
-                    e.printStackTrace();
                 }
             }
         });
     }
-
 
 
 
@@ -280,6 +304,7 @@ public class ContributeActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.d("result",result.toString());
         return result;
     }
 
@@ -339,15 +364,17 @@ public class ContributeActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
     }
 
-    class PostData extends AsyncTask<JSONObject,Boolean,Boolean>
+    class PostData extends AsyncTask<JSONObject,JSONObject,JSONObject>
     {
+        public AsyncResponse1 delegate = null;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
 
         @Override
-        protected Boolean doInBackground(JSONObject... params) {
+        protected JSONObject doInBackground(JSONObject... params) {
             JSONObject data;
             data = params[0];
 
@@ -362,7 +389,8 @@ public class ContributeActivity extends AppCompatActivity {
                 data.getString("long").equalsIgnoreCase(resultobj.getString("long")) &&
                 data.getString("address").equalsIgnoreCase(resultobj.getString("address")))
                 {
-                    return true;
+                    Log.d("returning not null","ASDsad");
+                    return resultobj;
                 }
 
 
@@ -370,19 +398,45 @@ public class ContributeActivity extends AppCompatActivity {
             {
                 e.printStackTrace();
             }
-
-            return false;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            if(aBoolean)
+        protected void onPostExecute(JSONObject jsonObject) {
+            if(jsonObject!=null)
             {
-                Toast.makeText(getBaseContext(),"Successfully contributed",Toast.LENGTH_SHORT).show();
+                Log.d("length not null",String.valueOf(jsonObject.length()));
+                Toast.makeText(getApplicationContext(),"Successfully contributed",Toast.LENGTH_SHORT).show();
+
+                Intent intent1 = new Intent();
+                intent1.setClass(getApplicationContext(),ShowPlaceActivity.class);
+
+                try{
+                    intent1.putExtra("name",jsonObject.getString("name"));
+                    intent1.putExtra("address",jsonObject.getString("address"));
+                    intent1.putExtra("desc",jsonObject.getString("desc"));
+                    intent1.putExtra("category",jsonObject.getString("category"));
+                    intent1.putExtra("image",jsonObject.getString("image"));
+                    intent1.putExtra("lat",jsonObject.getString("lat"));
+                    intent1.putExtra("long",jsonObject.getString("long"));
+
+                    intent1.putExtra("id",jsonObject.getString("_id"));
+                    intent1.putExtra("comments",jsonObject.getString("comments"));
+
+                    finish();
+
+                    startActivity(intent1);
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+
             }
-            else{
-                Toast.makeText(getBaseContext(),"Something went wrong,please try again later",Toast.LENGTH_SHORT).show();
+            else
+            {
+                Toast.makeText(getApplicationContext(),"Something went wrong,please try again later",Toast.LENGTH_SHORT).show();
+
             }
         }
     }
@@ -399,7 +453,7 @@ public class ContributeActivity extends AppCompatActivity {
                 img.setImageBitmap(selectedImage);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                selectedImage.compress(Bitmap.CompressFormat.JPEG, 30, baos);
+                selectedImage.compress(Bitmap.CompressFormat.JPEG, 20, baos);
 
                 byte[] b = baos.toByteArray();
                 selectedImg = Base64.encodeToString(b, Base64.NO_WRAP);
