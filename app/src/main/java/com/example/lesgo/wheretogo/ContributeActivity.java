@@ -97,12 +97,26 @@ public class ContributeActivity extends AppCompatActivity{
 
         builder1 = new AlertDialog.Builder(this);
 
-        String[] items = new String[]{"Restaurant","Shopping mall","Accomodation", "Local attractions"};
+        String[] items = new String[]{"Restaurant","Accomodation", "Local attractions"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
         spinner.setAdapter(adapter);
 
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        Location a = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+       /* String lt = String.valueOf(a.getLatitude());
+        String lg = String.valueOf(a.getLongitude());*/
+
+        if(a!=null)
+        {
+            lat = String.valueOf(a.getLatitude());
+            longt = String.valueOf(a.getLongitude());
+        }
+
+
+        //Toast.makeText(getApplicationContext(), lt + "        " + lg , Toast.LENGTH_SHORT).show();
+
 
         // Define a listener that responds to location updates
         llistener = new LocationListener() {
@@ -120,8 +134,13 @@ public class ContributeActivity extends AppCompatActivity{
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
-            public void onProviderEnabled(String provider) {}
-            public void onProviderDisabled(String provider) {}
+            public void onProviderEnabled(String provider) {
+                Toast.makeText(getApplicationContext(),"GPS has been enabled",Toast.LENGTH_SHORT).show();
+            }
+            public void onProviderDisabled(String provider) {
+                Toast.makeText(getApplicationContext(),"GPS has been disabled",Toast.LENGTH_SHORT).show();
+
+            }
         };
 
 
@@ -211,7 +230,8 @@ public class ContributeActivity extends AppCompatActivity{
                             }
                             else{
                                 Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
-                                new PostData().execute(data);
+                               // new PostData().execute(data);
+                                asyncTask.execute(data);
                                 errorcount =0;
                             }
                         }
@@ -434,7 +454,6 @@ public class ContributeActivity extends AppCompatActivity{
             else
             {
                 Toast.makeText(getApplicationContext(),"Something went wrong,please try again later",Toast.LENGTH_SHORT).show();
-
             }
         }
     }
@@ -451,7 +470,7 @@ public class ContributeActivity extends AppCompatActivity{
                 img.setImageBitmap(selectedImage);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                selectedImage.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+                selectedImage.compress(Bitmap.CompressFormat.JPEG, 10, baos);
 
                 byte[] b = baos.toByteArray();
                 selectedImg = Base64.encodeToString(b, Base64.NO_WRAP);
