@@ -366,8 +366,6 @@ public class ContributeActivity extends AppCompatActivity{
 
     class PostData extends AsyncTask<JSONObject,JSONObject,JSONObject>
     {
-        public AsyncResponse1 delegate = null;
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
