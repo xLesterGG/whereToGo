@@ -105,13 +105,16 @@ public class ContributeActivity extends AppCompatActivity{
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         Location a = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-       /* String lt = String.valueOf(a.getLatitude());
+      /*  String lt = String.valueOf(a.getLatitude());
         String lg = String.valueOf(a.getLongitude());*/
 
         if(a!=null)
         {
+
             lat = String.valueOf(a.getLatitude());
             longt = String.valueOf(a.getLongitude());
+            Toast.makeText(getApplicationContext(),lat+longt,Toast.LENGTH_SHORT).show();
+
         }
 
 
@@ -124,10 +127,10 @@ public class ContributeActivity extends AppCompatActivity{
                 // Called when a new location is found by the network location provider.
                 lat = String.valueOf(loc.getLatitude());
                 longt = String.valueOf(loc.getLongitude());
-               /* Toast.makeText(
+                Toast.makeText(
                         getBaseContext(),
                         "Location changed: Lat: " + loc.getLatitude() + " Lng: "
-                                + loc.getLongitude(), Toast.LENGTH_SHORT).show();*/
+                                + loc.getLongitude(), Toast.LENGTH_SHORT).show();
                 gps.setText("Activated");
                 eLat.setText(lat);
                 eLong.setText(longt);
@@ -178,76 +181,88 @@ public class ContributeActivity extends AppCompatActivity{
 
                         JSONObject aaa;
                         aaa = callApi(lat,longt);
+                        /*JSONArray result = aaa.getJSONArray("results");
+                        Log.d("result",result.toString());*/
 
-                        JSONArray result = aaa.getJSONArray("results");
-                        JSONObject first = result.getJSONObject(0);
-                        String address = first.getString("formatted_address");
-
-                        //  Log.d("address",address);
-                        String sample = address.replace(",", "");
-                        String[] elements = sample.split(" ");
-
-                        String input = eAddress.getText().toString();
-                        input = input.replace(",", "");
-                        String[] inputs = input.split(" ");
-
-                        Boolean add = checkAddress(elements,inputs,elements.length);
-
-
-                        if(add)
+                        if(aaa!=null)
                         {
+                            JSONArray result = aaa.getJSONArray("results");
+                            Log.d("result",result.toString());
 
-                            if(selectedImg.equalsIgnoreCase(""))
+                            JSONObject first = result.getJSONObject(0);
+                            String address = first.getString("formatted_address");
+                            String sample = address.replace(",", "");
+                            String[] elements = sample.split(" ");
+
+                            String input = eAddress.getText().toString();
+                            input = input.replace(",", "");
+                            String[] inputs = input.split(" ");
+
+                            Boolean add = checkAddress(elements,inputs,elements.length);
+
+                          //  Boolean add = true;
+                            if(add)
                             {
-                                builder1.setTitle("Confirm submission");
-                                builder1.setMessage("Are you sure you want to continue without adding an image");
-                                builder1.setCancelable(true);
 
-                                builder1.setPositiveButton(
-                                        "Yes",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int ida) {
-                                                Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
-                                                //new PostData().execute(data);
-                                                //execute the async task
-                                                asyncTask.execute(data);
-                                                errorcount =0;
-                                                dialog.cancel();
-                                            }
-                                        });
+                                if(selectedImg.equalsIgnoreCase(""))
+                                {
+                                    builder1.setTitle("Confirm submission");
+                                    builder1.setMessage("Are you sure you want to continue without adding an image");
+                                    builder1.setCancelable(true);
 
-                                builder1.setNegativeButton(
-                                        "No",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.cancel();
-                                            }
-                                        });
+                                    builder1.setPositiveButton(
+                                            "Yes",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int ida) {
+                                                    Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                                    //new PostData().execute(data);
+                                                    //execute the async task
+                                                    asyncTask.execute(data);
+                                                    errorcount =0;
+                                                    dialog.cancel();
+                                                }
+                                            });
 
-                                AlertDialog alert11 = builder1.create();
-                                alert11.show();
+                                    builder1.setNegativeButton(
+                                            "No",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
 
+                                    AlertDialog alert11 = builder1.create();
+                                    alert11.show();
+
+                                }
+                                else{
+                                    Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                    // new PostData().execute(data);
+                                    asyncTask.execute(data);
+                                    errorcount =0;
+                                }
                             }
                             else{
-                                Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
-                               // new PostData().execute(data);
-                                asyncTask.execute(data);
-                                errorcount =0;
+                                errorcount+=1;
+                                if(errorcount>5)
+                                {
+                                    Toast.makeText(getBaseContext(),"You seem to not know your the accurate address of your location. " +
+                                            "Please get the accurate address before trying again",Toast.LENGTH_SHORT).show();
+
+                                }
+                                else{
+                                    Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or " +
+                                            "you are not at the correct location",Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }
                         else{
-                            errorcount+=1;
-                            if(errorcount>5)
-                            {
-                                Toast.makeText(getBaseContext(),"You seem to not know your the accurate address of your location. " +
-                                        "Please get the accurate address before trying again",Toast.LENGTH_SHORT).show();
-
-                            }
-                            else{
-                                Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or " +
-                                        "you are not at the correct location",Toast.LENGTH_SHORT).show();
-                            }
+                            Toast.makeText(getApplicationContext(),"Cannot check address",Toast.LENGTH_SHORT).show();
                         }
+
+
+                        //  Log.d("address",address);
+
 
 
                     }catch (Exception e){
@@ -332,8 +347,11 @@ public class ContributeActivity extends AppCompatActivity{
         InputStream is = null;
         JSONObject obj = new JSONObject();
 
+        Log.d("wewew", "lat" + lat + "long" + longt);
 
-        String link = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+ lat +","+ longt + "&key=AIzaSyAYIBpLtL-NFfV_3mepgb1cASQo8xlTaZs";
+        String link = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+ lat +","+ longt + "&key=AIzaSyCGeq_hDf3tFAb71Ho_3meOmiQQqqJ6JdE";
+
+      //  String link = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+ "110.377240" +","+ "1.532536" + "&key=AIzaSyB-32aoxlx7d_aoJMbJvG1PY99Tm4F-hgM";
         try{
             StringBuilder stringBuilder = new StringBuilder();
 
@@ -448,8 +466,6 @@ public class ContributeActivity extends AppCompatActivity{
                 {
                     e.printStackTrace();
                 }
-
-
             }
             else
             {

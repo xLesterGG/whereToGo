@@ -72,8 +72,17 @@ public class CustomAdapter  extends RecyclerView.Adapter<CustomAdapter.CustomVie
 
         holder.txtAddress.setText(m.getAddress());
         holder.txtName.setText(m.getName());
-        holder.imgView.setImageBitmap(m.getImg());
+
         holder.txtCategory.setText(m.getCategory());
+
+        if(m.getImgstring().equalsIgnoreCase(""))
+        {
+
+        }
+        else
+        {
+            holder.imgView.setImageBitmap(m.getImg());
+        }
     }
 
     @Override

@@ -128,13 +128,10 @@
         android:lines="2"
         android:gravity="bottom"
         android:id="@+id/description"
+
         />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Image"
-        android:id="@+id/picture"/>
+
 
     <ImageView
         android:layout_width="150dp"
@@ -147,14 +144,21 @@
         android:layout_height="wrap_content"
         android:id="@+id/gpsabc"
         android:text="aaa"/>
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
         android:id="@+id/submit"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Image"
+        android:id="@+id/picture"/>
+
+
+
 
 
 

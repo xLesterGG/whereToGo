@@ -1,9 +1,13 @@
 package com.example.lesgo.wheretogo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,17 +47,21 @@ import java.util.TimerTask;
 
 public class ShowPlaceActivity extends AppCompatActivity {
 
-    TextView name,category,address,desc;
+    TextView name,category,address,desc,nocomment;
     ImageView img;
     Bundle bundle;
     EditText commen,username;
     JSONArray comments;
-    Button addcomment;
+    Button addcomment,showlocation;
     String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray;
     Spinner spinner;
 
     RecyclerView recy_view;
     CommentsAdapter adapter1;
+
+    LocationManager locationManager;
+    LocationListener llistener;
+    String lat,longt;
 
     List<Comment> comment_list = new ArrayList<>();
 
@@ -61,6 +69,41 @@ public class ShowPlaceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_place);
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Location a = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        if(a!=null)
+        {
+            Log.d("null","null");
+            lat = String.valueOf(a.getLatitude());
+            longt = String.valueOf(a.getLongitude());
+        }
+
+        llistener = new LocationListener() {
+            public void onLocationChanged(Location loc) {
+                // Called when a new location is found by the network location provider.
+                lat = String.valueOf(loc.getLatitude());
+                longt = String.valueOf(loc.getLongitude());
+                Toast.makeText(
+                        getBaseContext(),
+                        "Location changed: Lat: " + loc.getLatitude() + " Lng: "
+                                + loc.getLongitude(), Toast.LENGTH_SHORT).show();
+               /* eLat.setText(lat);
+                eLong.setText(longt);*/
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            public void onProviderEnabled(String provider) {
+                Toast.makeText(getApplicationContext(),"GPS has been enabled",Toast.LENGTH_SHORT).show();
+            }
+            public void onProviderDisabled(String provider) {
+                Toast.makeText(getApplicationContext(),"GPS has been disabled, please enable your GPS",Toast.LENGTH_SHORT).show();
+
+            }
+        };
+
+
+        showlocation = (Button)findViewById(R.id.showplace);
 
         name = (TextView)findViewById(R.id.name);
         category = (TextView)findViewById(R.id.category);
@@ -70,6 +113,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         commen = (EditText)findViewById(R.id.comment);
         addcomment = (Button)findViewById(R.id.submitcomment);
         username = (EditText)findViewById(R.id.username);
+        nocomment = (TextView)findViewById(R.id.nocomment);
 
 
         bundle = getIntent().getExtras();
@@ -83,8 +127,11 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
         id = bundle.getString("id");
 
-        commentarray = bundle.getString("comments");
+        Log.d("iamhere","aaa" + latitude + longtitude);
 
+        Log.d("iamhere1","bbb" + lat + longt);
+        commentarray = bundle.getString("comments");
+        Log.d("iamhere","aaa" + latitude + longtitude);
 
         spinner = (Spinner)findViewById(R.id.spin);
         String[] items = new String[]{"1","2","3","4","5"};
@@ -94,6 +141,13 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
         try{
             comments = new JSONArray(commentarray); // convert string to json
+
+            if(comments.length()<1)
+            {
+                nocomment.setVisibility(View.VISIBLE);
+                recy_view.setVisibility(View.GONE);
+            }
+
 
             for(int i=0;i<comments.length();i++)
             {
@@ -139,6 +193,34 @@ public class ShowPlaceActivity extends AppCompatActivity {
         address.setText(addr);
         desc.setText(descstr);
 
+
+        showlocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(getApplicationContext(),MapActivity.class);
+
+                intent.putExtra("dlat",latitude);
+                intent.putExtra("dlong",longtitude);
+
+                if(lat==null && longt==null){
+                    Toast.makeText(getApplicationContext(),"Please ensure that your gps is on",Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    intent.putExtra("olat",lat);
+                    intent.putExtra("olong",longt);
+
+                    Log.d("abcd",latitude+longtitude);
+                    Log.d("def",lat+longt);
+
+                    startActivity(intent);
+                }
+
+
+
+            }
+        });
 
         addcomment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,9 +293,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                     finish();
                     startActivity(intent);*/
-
-
-
 
                 }
 

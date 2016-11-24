@@ -148,6 +148,8 @@ public class BlankFragment extends Fragment {
                 intent.putExtra("lat",place.getLat());
                 intent.putExtra("long",place.getLongi());
 
+                //Log.d("hereabc",place.getLat()+place.getLongi());
+
                 intent.putExtra("id",place.getId());
                 intent.putExtra("comments",place.getComments().toString());
                 startActivity(intent);
