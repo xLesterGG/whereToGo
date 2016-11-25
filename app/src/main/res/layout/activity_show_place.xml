@@ -23,7 +23,17 @@
                 android:layout_gravity="center"
                 android:id="@+id/image"
                 android:src="@drawable/noimg"
-                android:padding="1dp"/>
+                android:padding="1dp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Desc"
+                android:id="@+id/desc"
+                android:layout_gravity="center"/>
+
+
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -50,28 +60,26 @@
             </LinearLayout>
             
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#B3C2C7"
-                android:padding="10dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#B3C2C7"
+            android:padding="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Place information"
-                    android:textSize="20dp"
-                    android:layout_gravity="center"
-                    android:textColor="#ffffff"/>
-            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Place information"
+                android:textSize="20dp"
+                android:layout_gravity="center"
+                android:textColor="#ffffff"/>
+             </LinearLayout>
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-
 
                 <TextView
                     android:layout_marginLeft="130dp"
@@ -107,17 +115,35 @@
                 android:layout_gravity="center"
                 />
 
-            <TextView
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#B3C2C7"
+                android:padding="10dp"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Comments and ratings"
+                    android:textSize="20dp"
+                    android:layout_gravity="center"
+                    android:textColor="#ffffff"/>
+            </LinearLayout>
+
+
+            <RatingBar
+                android:id="@+id/ratingBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Desc"
-                android:id="@+id/desc"/>
-
-
-            <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your comment"/>
+                android:numStars="5"
+                android:stepSize="1"
+                android:rating="1"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"/>
 
             <EditText
                 android:layout_width="wrap_content"
@@ -125,13 +151,8 @@
                 android:id="@+id/comment"
                 android:ems="15"
                 android:singleLine="false"
+                android:hint="Your comment"
                 />
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Your name"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -141,28 +162,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/username"
-                    android:ems="5"
+                    android:ems="9"
+                    android:hint="Your name (optional)"
                     />
 
-
-                <TextView
+                <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rating"/>
-
-                <Spinner
-                    android:id="@+id/spin"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:text="Submit"
+                    android:id="@+id/submitcomment"/>
 
             </LinearLayout>
 
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Submit"
-                android:id="@+id/submitcomment"/>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -175,11 +188,6 @@
                     android:text="No comments yet! Be the first to comment"
                     android:visibility="gone"
                     android:id="@+id/nocomment"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Comments "/>
 
                 <android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"

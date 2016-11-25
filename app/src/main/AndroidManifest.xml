@@ -27,7 +27,8 @@
         <activity
             android:name=".ContributeActivity"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ShowPlaceActivity" />
+        <activity android:name=".ShowPlaceActivity"
+            android:windowSoftInputMode="stateHidden"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

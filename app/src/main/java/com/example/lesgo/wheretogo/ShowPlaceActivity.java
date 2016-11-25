@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,9 +66,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
     EditText commen,username;
     JSONArray comments;
     Button addcomment;
-    String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray;
-    Spinner spinner;
-
+    String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray,latestrating;
+    RatingBar ratingbar;
     RecyclerView recy_view;
     CommentsAdapter adapter1;
 
@@ -88,8 +88,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
         uberbtn = (RideRequestButton)findViewById(R.id.uber);
         uberbtn.setEnabled(false); // prevent clicking until data is loaded
-
-
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Location a = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
@@ -131,6 +129,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         addcomment = (Button)findViewById(R.id.submitcomment);
         username = (EditText)findViewById(R.id.username);
         nocomment = (TextView)findViewById(R.id.nocomment);
+        ratingbar = (RatingBar)findViewById(R.id.ratingBar);
 
 
         bundle = getIntent().getExtras();
@@ -148,15 +147,14 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
 
         Log.d("iamhere","aaa" + latitude + longtitude);
-
         Log.d("iamhere1","bbb" + lat + longt);
         commentarray = bundle.getString("comments");
         Log.d("iamhere","aaa" + latitude + longtitude);
 
-        spinner = (Spinner)findViewById(R.id.spin);
+        /*spinner = (Spinner)findViewById(R.id.spin);
         String[] items = new String[]{"1","2","3","4","5"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        spinner.setAdapter(adapter);
+        spinner.setAdapter(adapter);*/
 
         category.setText(categorystr);
         address.setText(addr);
@@ -251,6 +249,14 @@ public class ShowPlaceActivity extends AppCompatActivity {
         }
 
 
+        ratingbar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                latestrating = String.valueOf((int)rating);
+
+              //  Toast.makeText(getApplicationContext(),latestrating,Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
 
@@ -305,7 +311,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                         // comments //comments is json array
                         JSONObject comment = new JSONObject();
-                        comment.put("rating",spinner.getSelectedItem().toString());
+                        //comment.put("rating",spinner.getSelectedItem().toString());
+                        comment.put("rating",String.valueOf(latestrating));
                         comment.put("comment",commen.getText().toString());
                         comment.put("username",username.getText().toString());
 
