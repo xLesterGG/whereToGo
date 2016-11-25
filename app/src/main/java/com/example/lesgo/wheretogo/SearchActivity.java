@@ -22,6 +22,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +62,7 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
 
     @Override
     protected Dialog onCreateDialog(int id) {
+
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Getting available places...");
@@ -137,6 +139,9 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
             tab.setCustomView(pagerAdapter.getTabView(i));
         }
 
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+
     }
 
     class getAll extends AsyncTask<Void,JSONArray,JSONArray>
@@ -200,8 +205,6 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
         @Override
         public Fragment getItem(int position) {
 
-
-
             switch (position) {
                 case 0:
                     Bundle arg = new Bundle();
@@ -243,7 +246,5 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
         }
 
     }
-
-
 
 }

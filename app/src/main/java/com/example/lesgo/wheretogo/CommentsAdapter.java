@@ -42,8 +42,8 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.Custom
     @Override
     public void onBindViewHolder(CustomViewHolder holder, int position) {
         Comment c = comment_list.get(position);
-        holder.txtcomment.setText(c.getComment());
-        holder.txtname.setText(c.getUsername());
+        holder.txtcomment.setText("\""+c.getComment() + "\"");
+        holder.txtname.setText("by user "+c.getUsername());
         holder.txtrating.setText(c.getRating());
 
     }

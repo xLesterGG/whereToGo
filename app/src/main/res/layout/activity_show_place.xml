@@ -46,8 +46,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="5"
+                    android:text="-"
                     android:textSize="80dp"
+                    android:id="@+id/avgrating"
                     />
 
                 <TextView
@@ -58,6 +59,14 @@
                     android:layout_gravity="center"/>
 
             </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No ratings yet"
+                android:layout_gravity="center"
+                android:id="@+id/norating"
+                />
             
             <LinearLayout
             android:layout_width="match_parent"
@@ -77,35 +86,33 @@
 
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_marginLeft="130dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Category"
-                    android:id="@+id/category"
-                    android:textSize="20dp"/>
-
-                <ImageView
-                    android:layout_marginLeft="20dp"
-                    android:layout_width="50px"
-                    android:layout_height="50px"
-                    android:src="@mipmap/ic_launcher"/>
-
-            </LinearLayout>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Address"
-                android:id="@+id/address"
-                android:textSize="20dp"
+                android:orientation="horizontal"
                 android:layout_gravity="center"
-                android:textAlignment="center"
-                />
+                android:layout_marginBottom="20dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/location"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="20dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:id="@+id/address"
+                    android:textSize="20dp"
+                    android:layout_gravity="center"
+
+                    />
+            </LinearLayout>
+
+
 
             <com.uber.sdk.android.rides.RideRequestButton
                 android:layout_width="wrap_content"
@@ -187,7 +194,8 @@
                     android:layout_height="wrap_content"
                     android:text="No comments yet! Be the first to comment"
                     android:visibility="gone"
-                    android:id="@+id/nocomment"/>
+                    android:id="@+id/nocomment"
+                    android:layout_marginBottom="20dp"/>
 
                 <android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"

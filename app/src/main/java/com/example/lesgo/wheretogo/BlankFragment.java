@@ -1,6 +1,7 @@
 package com.example.lesgo.wheretogo;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -123,7 +125,6 @@ public class BlankFragment extends Fragment {
                         place_list.add(place);
                     }
 
-
                 }
 
             }
@@ -152,7 +153,7 @@ public class BlankFragment extends Fragment {
 
                 intent.putExtra("id",place.getId());
                 intent.putExtra("comments",place.getComments().toString());
-                startActivity(intent);
+                startActivityForResult(intent,1);
 
             }
         });
@@ -164,4 +165,29 @@ public class BlankFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode ==1)
+        {
+            Log.d("result", String.valueOf(resultCode));
+
+
+
+            if(resultCode == Activity.RESULT_OK)
+            {
+               /* Toast.makeText(getActivity().getApplicationContext(), "IS OK", Toast.LENGTH_SHORT).show();
+               getActivity().finish();*/
+                Intent i = new Intent();
+                i.setClass(getActivity().getApplicationContext(),SearchActivity.class);
+                startActivity(i);
+
+            }
+
+            //if(resultCode == Activity.RESULT_CANCELED)
+                //Toast.makeText(getActivity().getApplicationContext(), "IS cancel", Toast.LENGTH_SHORT).show();
+
+
+        }
+    }
 }

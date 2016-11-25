@@ -1,5 +1,6 @@
 package com.example.lesgo.wheretogo;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -60,7 +62,7 @@ import java.util.TimerTask;
 
 public class ShowPlaceActivity extends AppCompatActivity {
 
-    TextView category,address,desc,nocomment;
+    TextView address,desc,nocomment,avgrating,norating;
     ImageView img;
     Bundle bundle;
     EditText commen,username;
@@ -86,6 +88,9 @@ public class ShowPlaceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_place);
 
+
+
+        latestrating ="1";
         uberbtn = (RideRequestButton)findViewById(R.id.uber);
         uberbtn.setEnabled(false); // prevent clicking until data is loaded
 
@@ -119,9 +124,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
             }
         };
 
-
-
-        category = (TextView)findViewById(R.id.category);
+        norating = (TextView)findViewById(R.id.norating);
+        avgrating = (TextView)findViewById(R.id.avgrating);
         address =(TextView)findViewById(R.id.address);
         desc = (TextView)findViewById(R.id.desc);
         img  = (ImageView)findViewById(R.id.image);
@@ -141,6 +145,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
         latitude = bundle.getString("lat");
         longtitude = bundle.getString("long");
 
+
+
         id = bundle.getString("id");
         setTitle(namestr);
 
@@ -151,12 +157,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
         commentarray = bundle.getString("comments");
         Log.d("iamhere","aaa" + latitude + longtitude);
 
-        /*spinner = (Spinner)findViewById(R.id.spin);
-        String[] items = new String[]{"1","2","3","4","5"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
-        spinner.setAdapter(adapter);*/
-
-        category.setText(categorystr);
         address.setText(addr);
         desc.setText(descstr);
 
@@ -197,9 +197,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
         uberbtn.loadRideInformation();
         //*************************************************************************************************************** UBER SECTION
 
-
-
-
         try{
             comments = new JSONArray(commentarray); // convert string to json
 
@@ -207,28 +204,64 @@ public class ShowPlaceActivity extends AppCompatActivity {
             {
                 nocomment.setVisibility(View.VISIBLE);
                 recy_view.setVisibility(View.GONE);
+
             }
 
 
-            for(int i=0;i<comments.length();i++)
+
+            if(comments.length()>=1)
             {
-                JSONObject comment = comments.getJSONObject(i);
+                norating.setVisibility(View.GONE);
+                int totalrating=0;
+                int nofrating=0;
 
-                String name,com,rating;
+                for(int counter=comments.length() - 1; counter >= 0;counter--){
+                    JSONObject comment = comments.getJSONObject(counter);
 
-                name = comment.getString("username");
-                com = comment.getString("comment");
-                rating = comment.getString("rating");
+                    String name,com,rating;
 
-                Comment c = new Comment(com,name,rating);
-                comment_list.add(c);
+                    name = comment.getString("username");
+                    com = comment.getString("comment");
+                    rating = comment.getString("rating");
+
+                    totalrating += Integer.valueOf(rating);
+                    nofrating +=1;
+
+                    Comment c = new Comment(com,name,rating);
+                    comment_list.add(c);
+                }
+
+
+             /*   for(int i=0;i<comments.length();i++)
+                {
+                    JSONObject comment = comments.getJSONObject(i);
+
+                    String name,com,rating;
+
+                    name = comment.getString("username");
+                    com = comment.getString("comment");
+                    rating = comment.getString("rating");
+
+                    totalrating += Integer.valueOf(rating);
+                    nofrating +=1;
+
+                    Comment c = new Comment(com,name,rating);
+                    comment_list.add(c);
+                }*/
+
+                int avgr = totalrating/nofrating;
+                avgrating.setText(String.valueOf(avgr));
 
             }
+
+
+
         }catch (Exception e){
             e.printStackTrace();
         }
 
         adapter1 = new CommentsAdapter(comment_list);
+        Log.d("length",String.valueOf(comment_list.size()));
 
         recy_view = (RecyclerView)findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -253,12 +286,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 latestrating = String.valueOf((int)rating);
-
-              //  Toast.makeText(getApplicationContext(),latestrating,Toast.LENGTH_SHORT).show();
             }
         });
-
-
 
         address.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -331,33 +360,10 @@ public class ShowPlaceActivity extends AppCompatActivity {
                        // Toast.makeText(getBaseContext(),"posted",Toast.LENGTH_SHORT);
 
 
-
-
                     }catch(Exception e)
                     {
                         e.printStackTrace();
                     }
-
-
-
-
-                    /*Intent intent = new Intent();
-                    intent.setClass(getApplicationContext(),ShowPlaceActivity.class);
-                    intent.putExtra("name",place.getName());
-                    intent.putExtra("address",place.getAddress());
-                    intent.putExtra("desc",place.getDesc());
-                    intent.putExtra("category",place.getCategory());
-                    intent.putExtra("image",place.getImgstring());
-                    intent.putExtra("lat",place.getLat());
-                    intent.putExtra("long",place.getLongi());
-
-                    intent.putExtra("id",place.getId());
-                    intent.putExtra("comments",place.getComments().toString());
-
-
-                    finish();
-                    startActivity(intent);*/
-
                 }
 
             }
@@ -481,6 +487,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                     intent1.putExtra("id",updated.getString("_id"));
                     intent1.putExtra("comments",updated.getString("comments"));
+                    intent1.putExtra("status","ok"); // to indicate comment has occured
+
 
                     finish();
                     overridePendingTransition(0, 0);
@@ -541,4 +549,36 @@ public class ShowPlaceActivity extends AppCompatActivity {
         return obj;
 
     }
+
+    @Override
+    public void onBackPressed() {
+
+        if(bundle.getString("status")!=null){
+            Log.d("OK","OK"); // it can reach here
+
+            finish();
+            super.onBackPressed();
+        }
+        else{
+            finish1();
+            super.onBackPressed();
+        }
+
+
+
+    }
+
+    @Override
+    public void finish() {
+        Intent data = new Intent();
+        setResult(RESULT_OK, data);
+        super.finish();
+    }
+
+    public void finish1() {
+        Intent data = new Intent();
+        setResult(RESULT_CANCELED, data);
+        super.finish();
+    }
+
 }
