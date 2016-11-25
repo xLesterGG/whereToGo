@@ -17,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,16 +26,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+
+import com.uber.sdk.android.rides.RideRequestButton;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.http.params.HttpConnectionParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,9 +44,8 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.GZIPOutputStream;
+
+
 
 public class ContributeActivity extends AppCompatActivity{
 
@@ -81,6 +73,7 @@ public class ContributeActivity extends AppCompatActivity{
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
 
 
         submit = (Button)findViewById(R.id.submit);

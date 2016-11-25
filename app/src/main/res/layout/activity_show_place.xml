@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:uber="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,25 +16,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#B3C2C7"
-                android:padding="10dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Name here"
-                    android:id="@+id/name"
-                    android:textSize="20dp"
-                    android:layout_gravity="center"
-                    android:textColor="#ffffff"
-                    android:textStyle="bold"/>
-
-
-            </LinearLayout>
 
             <ImageView
                 android:layout_width="400dp"
@@ -48,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_gravity="center"
+                android:id="@+id/ratinglayout"
                 >
 
                 <TextView
@@ -88,6 +71,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+
+
                 <TextView
                     android:layout_marginLeft="130dp"
                     android:layout_width="wrap_content"
@@ -104,18 +89,23 @@
 
             </LinearLayout>
 
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Address"
-                android:id="@+id/address"/>
+                android:id="@+id/address"
+                android:textSize="20dp"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                />
 
-            <Button
+            <com.uber.sdk.android.rides.RideRequestButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/showplace"
-                android:text="location"/>
+                android:id="@+id/uber"
+                uber:ub__style="black"
+                android:layout_gravity="center"
+                />
 
             <TextView
                 android:layout_width="wrap_content"

@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,14 +17,25 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.uber.sdk.android.rides.RideParameters;
+import com.uber.sdk.android.rides.RideRequestButton;
+import com.uber.sdk.android.rides.RideRequestButtonCallback;
+import com.uber.sdk.rides.client.ServerTokenSession;
+import com.uber.sdk.rides.client.SessionConfiguration;
+import com.uber.sdk.rides.client.error.ApiError;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,12 +59,12 @@ import java.util.TimerTask;
 
 public class ShowPlaceActivity extends AppCompatActivity {
 
-    TextView name,category,address,desc,nocomment;
+    TextView category,address,desc,nocomment;
     ImageView img;
     Bundle bundle;
     EditText commen,username;
     JSONArray comments;
-    Button addcomment,showlocation;
+    Button addcomment;
     String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray;
     Spinner spinner;
 
@@ -65,10 +77,19 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
     List<Comment> comment_list = new ArrayList<>();
 
+    RideRequestButton uberbtn;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_place);
+
+        uberbtn = (RideRequestButton)findViewById(R.id.uber);
+        uberbtn.setEnabled(false); // prevent clicking until data is loaded
+
+
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Location a = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
@@ -88,8 +109,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
                         getBaseContext(),
                         "Location changed: Lat: " + loc.getLatitude() + " Lng: "
                                 + loc.getLongitude(), Toast.LENGTH_SHORT).show();
-               /* eLat.setText(lat);
-                eLong.setText(longt);*/
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -103,9 +122,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         };
 
 
-        showlocation = (Button)findViewById(R.id.showplace);
 
-        name = (TextView)findViewById(R.id.name);
         category = (TextView)findViewById(R.id.category);
         address =(TextView)findViewById(R.id.address);
         desc = (TextView)findViewById(R.id.desc);
@@ -126,6 +143,9 @@ public class ShowPlaceActivity extends AppCompatActivity {
         longtitude = bundle.getString("long");
 
         id = bundle.getString("id");
+        setTitle(namestr);
+
+
 
         Log.d("iamhere","aaa" + latitude + longtitude);
 
@@ -137,6 +157,49 @@ public class ShowPlaceActivity extends AppCompatActivity {
         String[] items = new String[]{"1","2","3","4","5"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
         spinner.setAdapter(adapter);
+
+        category.setText(categorystr);
+        address.setText(addr);
+        desc.setText(descstr);
+
+    //*************************************************************************************************************** UBER SECTION
+        RideParameters rideParams = new RideParameters.Builder()
+                .setPickupLocation(Double.parseDouble(lat),Double.parseDouble(longt),"Your current location",null)  // get value from gps
+                .setDropoffLocation(Double.parseDouble(latitude),Double.parseDouble(longtitude),null,namestr)
+                .build();
+
+        SessionConfiguration config = new SessionConfiguration.Builder()
+                .setClientId("xAeXBg-Pz_Hy6vhuLJeHRenr9dcxf2W4")
+                .setServerToken("GluLkrDBR3KyNFQv_yMu2JE--_ani4E6hGGv_gCw")
+                .build();
+
+        ServerTokenSession session = new ServerTokenSession(config);
+        RideRequestButtonCallback callback = new RideRequestButtonCallback() {
+
+            @Override
+            public void onRideInformationLoaded() {
+                uberbtn.setEnabled(true);
+            }
+
+            @Override
+            public void onError(ApiError apiError) {
+                Log.d("error","error" + apiError);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Log.d("error","error" + throwable);
+
+            }
+        };
+
+        uberbtn.setRideParameters(rideParams);
+        uberbtn.setSession(session);
+        uberbtn.setCallback(callback);
+        uberbtn.loadRideInformation();
+        //*************************************************************************************************************** UBER SECTION
+
+
 
 
         try{
@@ -188,13 +251,10 @@ public class ShowPlaceActivity extends AppCompatActivity {
         }
 
 
-        name.setText(namestr);
-        category.setText(categorystr);
-        address.setText(addr);
-        desc.setText(descstr);
 
 
-        showlocation.setOnClickListener(new View.OnClickListener() {
+
+        address.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -216,9 +276,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                     startActivity(intent);
                 }
-
-
-
             }
         });
 
