@@ -487,7 +487,7 @@ public class ContributeActivity extends AppCompatActivity{
                 img.setImageBitmap(selectedImage);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                selectedImage.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+                selectedImage.compress(Bitmap.CompressFormat.JPEG, 20, baos);
 
                 byte[] b = baos.toByteArray();
                 selectedImg = Base64.encodeToString(b, Base64.NO_WRAP);
