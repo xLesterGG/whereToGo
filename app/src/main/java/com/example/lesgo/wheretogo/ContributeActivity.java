@@ -79,11 +79,11 @@ public class ContributeActivity extends AppCompatActivity{
         submit = (Button)findViewById(R.id.submit);
         eName = (EditText)findViewById(R.id.name);
         eAddress= (EditText)findViewById(R.id.address);
-        eAddress.setText("lorong bayur bukit 18 93350 kuching sarawak");
+        eAddress.setText("jalan kempas 93350 kuching sarawak");
         eLat= (EditText)findViewById(R.id.latitude);
         eLong= (EditText)findViewById(R.id.longitude);
         eDesc= (EditText)findViewById(R.id.description);
-        picture = (Button)findViewById(R.id.picture) ;
+       /* picture = (Button)findViewById(R.id.picture) ;*/
         img = (ImageView)findViewById(R.id.img1);
         gps = (TextView)findViewById(R.id.gpsabc);
         spinner = (Spinner)findViewById(R.id.planets_spinner);
@@ -139,8 +139,7 @@ public class ContributeActivity extends AppCompatActivity{
             }
         };
 
-
-        picture.setOnClickListener(new View.OnClickListener() {
+        img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -148,6 +147,15 @@ public class ContributeActivity extends AppCompatActivity{
                 startActivityForResult(intent,1);
             }
         });
+
+   /*    picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent,1);
+            }
+        });*/
         // Register the listener with the Location Manager to receive location updates
         //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
 
@@ -165,8 +173,8 @@ public class ContributeActivity extends AppCompatActivity{
                     try{
                         data.put("name", eName.getText().toString());
                         data.put("address",eAddress.getText().toString());
-                        data.put("lat",eLat.getText().toString());
-                        data.put("long",eLong.getText().toString());
+                        data.put("lat",lat);
+                        data.put("long",longt);
                         data.put("desc",eDesc.getText().toString());
                         data.put("image",selectedImg.replace("=",""));
                         data.put("category",spinner.getSelectedItem().toString());
@@ -250,7 +258,7 @@ public class ContributeActivity extends AppCompatActivity{
                             }
                         }
                         else{
-                            Toast.makeText(getApplicationContext(),"Cannot check address",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"Cannot check address, please try again later",Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -286,7 +294,7 @@ public class ContributeActivity extends AppCompatActivity{
         double rounded = Math.round((double)length/2);
         Log.d("round",String.valueOf(rounded) + "i is " + String.valueOf(i));
 
-        if(i >= rounded -1)
+        if(i >= rounded )
             return true;
         else
             return false;
@@ -299,7 +307,7 @@ public class ContributeActivity extends AppCompatActivity{
         String result = null;
         try {
             //Connect
-            urlConnection = (HttpURLConnection) ((new URL("https://powerful-escarpment-79209.herokuapp.com/api/place").openConnection()));
+            urlConnection = (HttpURLConnection) ((new URL("http://powerful-escarpment-79209.herokuapp.com/api/place").openConnection()));
             urlConnection.setDoOutput(true);
            // urlConnection.setRequestProperty("Content-Type", "application/json");
             urlConnection.setRequestProperty("Content-Type", "application/json");
@@ -479,7 +487,7 @@ public class ContributeActivity extends AppCompatActivity{
                 img.setImageBitmap(selectedImage);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                selectedImage.compress(Bitmap.CompressFormat.JPEG, 10, baos);
+                selectedImage.compress(Bitmap.CompressFormat.JPEG, 25, baos);
 
                 byte[] b = baos.toByteArray();
                 selectedImg = Base64.encodeToString(b, Base64.NO_WRAP);
