@@ -1,16 +1,13 @@
 package com.example.lesgo.wheretogo;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,18 +15,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,8 +47,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ShowPlaceActivity extends AppCompatActivity {
 
@@ -144,11 +132,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
         latitude = bundle.getString("lat");
         longtitude = bundle.getString("long");
 
-
-
         id = bundle.getString("id");
         setTitle(namestr);
-
 
 
         Log.d("iamhere","aaa" + latitude + longtitude);
@@ -260,7 +245,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         }
 
         adapter1 = new CommentsAdapter(comment_list);
-        Log.d("length",String.valueOf(comment_list.size()));
+       // Log.d("length",String.valueOf(comment_list.size()));
 
         recy_view = (RecyclerView)findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
@@ -269,16 +254,21 @@ public class ShowPlaceActivity extends AppCompatActivity {
         recy_view.setAdapter(adapter1);
 
 
-        if(imgencoded.equalsIgnoreCase(""))
+        if(!imgencoded.equalsIgnoreCase(""))
         {
-            //img.setImageResource(R.drawable.noimg);
-           // img.setBackgroundColor(Color.TRANSPARENT);
-        }
-        else{
             byte[] decodedString = Base64.decode(imgencoded, Base64.NO_WRAP);
             Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             img.setImageBitmap(decodedImg);
+
+            //imgencoded = null;
+            //img.setImageResource(R.drawable.noimg);
+           // img.setBackgroundColor(Color.TRANSPARENT);
         }
+      /*  else{
+            byte[] decodedString = Base64.decode(imgencoded, Base64.NO_WRAP);
+            Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            img.setImageBitmap(decodedImg);
+        }*/
 
 
         ratingbar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {

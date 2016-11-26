@@ -10,24 +10,13 @@
     tools:context="com.example.lesgo.wheretogo.ContributeActivity"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <EditText
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:ems="7"
+        android:id="@+id/name"
+        android:hint="Place Name"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Place name:"/>
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="7"
-            android:layout_marginLeft="20dp"
-            android:id="@+id/name"/>
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -69,19 +58,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Address:"/>
-
-
-
-    </LinearLayout>
 
     <EditText
         android:layout_width="wrap_content"
@@ -90,6 +66,7 @@
         android:singleLine="false"
         android:lines="2"
         android:id="@+id/address"
+        android:hint="Address of place"
         />
 
     <LinearLayout
@@ -111,15 +88,6 @@
     </LinearLayout>
 
 
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Description:"
-        android:id="@+id/txtdesc"
-        android:layout_marginTop="30dp"/>
-
-
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -128,39 +96,41 @@
         android:lines="2"
         android:gravity="bottom"
         android:id="@+id/description"
+        android:hint="Description about the place"
 
         />
 
-
-
     <ImageView
-        android:layout_width="150dp"
+        android:layout_width="200dp"
         android:layout_height="100dp"
         android:id="@+id/img1"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Image"
+        android:id="@+id/picture"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/gpsabc"
-        android:text="aaa"/>
+        android:text="Status"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"/>
+
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
         android:layout_gravity="center"
         android:id="@+id/submit"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Image"
-        android:id="@+id/picture"/>
-
-
-
-
-
 
 
 </LinearLayout>
