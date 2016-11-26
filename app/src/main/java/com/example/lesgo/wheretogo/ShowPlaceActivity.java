@@ -89,7 +89,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_place);
 
 
-
         latestrating ="1";
         uberbtn = (RideRequestButton)findViewById(R.id.uber);
         uberbtn.setEnabled(false); // prevent clicking until data is loaded
@@ -203,7 +202,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
             if(comments.length()<1)
             {
                 nocomment.setVisibility(View.VISIBLE);
-                recy_view.setVisibility(View.GONE);
+             //   recy_view.setVisibility(View.GONE);
 
             }
 
@@ -320,7 +319,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                 if(commen.getText().toString().equalsIgnoreCase(""))
                 {
-                    Toast.makeText(getBaseContext(),"Please rate and comment before you submit your review",Toast.LENGTH_SHORT);
+                    Toast.makeText(getBaseContext(),"Please rate and comment before you submit your review",Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
@@ -336,15 +335,24 @@ public class ShowPlaceActivity extends AppCompatActivity {
                         data.put("category",categorystr);
 
 
-                        Log.d("aaaaaa",comments.toString() );
+                       // Log.d("aaaaaa",comments.toString() );
 
                         // comments //comments is json array
                         JSONObject comment = new JSONObject();
                         //comment.put("rating",spinner.getSelectedItem().toString());
                         comment.put("rating",String.valueOf(latestrating));
-                        comment.put("comment",commen.getText().toString());
-                        comment.put("username",username.getText().toString());
 
+                        if(username.getText().toString().equalsIgnoreCase(""))
+                        {
+                           comment.put("username","anon");
+
+                        }
+                        else
+                        {
+                            comment.put("username",username.getText().toString());
+                        }
+
+                        comment.put("comment",commen.getText().toString());
 
                         comments.put(comment);
 
@@ -471,12 +479,12 @@ public class ShowPlaceActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(),"Successfully commented",Toast.LENGTH_SHORT).show();
 
                 try{ // refresh data
+                    finish1();
 
                     JSONObject updated = getOnePlace(id);
 
                     Intent intent1 = new Intent();
                     intent1.setClass(getApplicationContext(),ShowPlaceActivity.class);
-
                     intent1.putExtra("name",updated.getString("name"));
                     intent1.putExtra("address",updated.getString("address"));
                     intent1.putExtra("desc",updated.getString("desc"));
@@ -487,14 +495,28 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                     intent1.putExtra("id",updated.getString("_id"));
                     intent1.putExtra("comments",updated.getString("comments"));
-                    intent1.putExtra("status","ok"); // to indicate comment has occured
+                    intent1.putExtra("status","ok"); // to indicate comment has occured*/
+                   // finish1();
 
+                  /*  Intent intent = new Intent();
+                    intent.setClass(getApplicationContext(),ShowPlaceActivity.class);
+                    intent.putExtra("name","aaa");
+                    intent.putExtra("address","aaa");
+                    intent.putExtra("desc","aaa");
+                    intent.putExtra("category","aaa");
+                    intent.putExtra("image","aaa");
+                    intent.putExtra("lat","aaa");
+                    intent.putExtra("long","aaa");
 
-                    finish();
-                    overridePendingTransition(0, 0);
+                    intent.putExtra("id","123");
+                    intent.putExtra("comments","");
+                    startActivity(intent);*/
 
-                    intent1.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                   /* overridePendingTransition(0, 0);
+
+                    intent1.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);*/
                     startActivity(intent1);
+                   // finish();
                 }catch (Exception e){
                     e.printStackTrace();
                 }
