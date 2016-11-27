@@ -84,7 +84,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Post comment..");
+        progressDialog.setMessage("Posting comment..");
 
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();
