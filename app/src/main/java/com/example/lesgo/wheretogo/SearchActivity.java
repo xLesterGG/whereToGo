@@ -55,7 +55,6 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         task.delegate = this;
-
         task.execute();
     }
 

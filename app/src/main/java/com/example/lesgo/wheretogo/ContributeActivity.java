@@ -106,13 +106,10 @@ public class ContributeActivity extends AppCompatActivity{
 
             lat = String.valueOf(a.getLatitude());
             longt = String.valueOf(a.getLongitude());
-            Toast.makeText(getApplicationContext(),lat+longt,Toast.LENGTH_SHORT).show();
-
+           // Toast.makeText(getApplicationContext(),lat+longt,Toast.LENGTH_SHORT).show();
         }
 
-
         //Toast.makeText(getApplicationContext(), lt + "        " + lg , Toast.LENGTH_SHORT).show();
-
 
         // Define a listener that responds to location updates
         llistener = new LocationListener() {
@@ -120,11 +117,11 @@ public class ContributeActivity extends AppCompatActivity{
                 // Called when a new location is found by the network location provider.
                 lat = String.valueOf(loc.getLatitude());
                 longt = String.valueOf(loc.getLongitude());
-                Toast.makeText(
+              /*  Toast.makeText(
                         getBaseContext(),
                         "Location changed: Lat: " + loc.getLatitude() + " Lng: "
-                                + loc.getLongitude(), Toast.LENGTH_SHORT).show();
-                gps.setText("Activated");
+                                + loc.getLongitude(), Toast.LENGTH_SHORT).show();*/
+                gps.setText("GPS is Activated");
                 eLat.setText(lat);
                 eLong.setText(longt);
             }
@@ -134,7 +131,7 @@ public class ContributeActivity extends AppCompatActivity{
                 Toast.makeText(getApplicationContext(),"GPS has been enabled",Toast.LENGTH_SHORT).show();
             }
             public void onProviderDisabled(String provider) {
-                Toast.makeText(getApplicationContext(),"GPS has been disabled",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"GPS has been disabled, please enable it",Toast.LENGTH_SHORT).show();
 
             }
         };
@@ -148,18 +145,7 @@ public class ContributeActivity extends AppCompatActivity{
             }
         });
 
-   /*    picture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                startActivityForResult(intent,1);
-            }
-        });*/
-        // Register the listener with the Location Manager to receive location updates
-        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
-
-        submit.setOnClickListener(new View.OnClickListener() {
+          submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final JSONObject data = new JSONObject();
@@ -181,7 +167,14 @@ public class ContributeActivity extends AppCompatActivity{
 
 
                         JSONObject aaa;
+
                         aaa = callApi(lat,longt);
+
+                        if(lat==null && longt==null)
+                        {
+                            Toast.makeText(getApplicationContext(),"Your GPS might not be on, please ensure it is on",Toast.LENGTH_SHORT).show();
+                        }
+
                         /*JSONArray result = aaa.getJSONArray("results");
                         Log.d("result",result.toString());*/
 
@@ -208,7 +201,7 @@ public class ContributeActivity extends AppCompatActivity{
                                 if(selectedImg.equalsIgnoreCase(""))
                                 {
                                     builder1.setTitle("Confirm submission");
-                                    builder1.setMessage("Are you sure you want to continue without adding an image");
+                                    builder1.setMessage("Are you sure you want to continue without adding an image?");
                                     builder1.setCancelable(true);
 
                                     builder1.setPositiveButton(
@@ -237,10 +230,34 @@ public class ContributeActivity extends AppCompatActivity{
 
                                 }
                                 else{
-                                    Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
-                                    // new PostData().execute(data);
-                                    asyncTask.execute(data);
-                                    errorcount =0;
+
+                                    builder1.setTitle("Confirm submission");
+                                    builder1.setMessage("Are you sure?");
+                                    builder1.setCancelable(true);
+
+                                    builder1.setPositiveButton(
+                                            "Yes",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int ida) {
+                                                    Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                                    // new PostData().execute(data);
+                                                    asyncTask.execute(data);
+                                                    errorcount =0;
+                                                }
+                                            });
+
+                                    builder1.setNegativeButton(
+                                            "No",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            });
+
+                                    AlertDialog alert11 = builder1.create();
+                                    alert11.show();
+
+
                                 }
                             }
                             else{
@@ -474,6 +491,9 @@ public class ContributeActivity extends AppCompatActivity{
             }
         }
     }
+
+
+    class ASCallApi extends AsyncTask<>
 
 
     @Override
