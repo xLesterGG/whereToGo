@@ -47,7 +47,7 @@ import java.net.URL;
 
 
 
-public class ContributeActivity extends AppCompatActivity{
+public class ContributeActivity extends AppCompatActivity implements AsyncResponse1{
 
     Button submit,picture;
     EditText eName,eAddress,eLat,eLong,eDesc;
@@ -62,6 +62,7 @@ public class ContributeActivity extends AppCompatActivity{
     int errorcount;
     AlertDialog.Builder builder1;
 
+    ASCallApi astask = new ASCallApi();
     PostData asyncTask =new PostData();
 
 
@@ -70,6 +71,7 @@ public class ContributeActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contribute);
 
+        astask.delegate = this;
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -79,7 +81,7 @@ public class ContributeActivity extends AppCompatActivity{
         submit = (Button)findViewById(R.id.submit);
         eName = (EditText)findViewById(R.id.name);
         eAddress= (EditText)findViewById(R.id.address);
-        eAddress.setText("jalan kempas 93350 kuching sarawak");
+        eAddress.setText("1327e, Lorong Bayor Bukit 16, Tabuan Jaya, 93350 Kuching, Sarawak, Malaysia");
         eLat= (EditText)findViewById(R.id.latitude);
         eLong= (EditText)findViewById(R.id.longitude);
         eDesc= (EditText)findViewById(R.id.description);
@@ -148,7 +150,6 @@ public class ContributeActivity extends AppCompatActivity{
           submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final JSONObject data = new JSONObject();
 
                 if(eName.getText().toString().equalsIgnoreCase("") || eAddress.getText().toString().equalsIgnoreCase("")
                         || eDesc.getText().toString().equalsIgnoreCase(""))
@@ -156,135 +157,15 @@ public class ContributeActivity extends AppCompatActivity{
                     Toast.makeText(getBaseContext(),"Please fill in all the details before submitting",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    try{
-                        data.put("name", eName.getText().toString());
-                        data.put("address",eAddress.getText().toString());
-                        data.put("lat",lat);
-                        data.put("long",longt);
-                        data.put("desc",eDesc.getText().toString());
-                        data.put("image",selectedImg.replace("=",""));
-                        data.put("category",spinner.getSelectedItem().toString());
 
+                    if(lat==null && longt==null)
+                    {
+                        Toast.makeText(getApplicationContext(),"Your GPS might not be on, please ensure it is on",Toast.LENGTH_SHORT).show();
+                    }
 
-                        JSONObject aaa;
-
-                        aaa = callApi(lat,longt);
-
-                        if(lat==null && longt==null)
-                        {
-                            Toast.makeText(getApplicationContext(),"Your GPS might not be on, please ensure it is on",Toast.LENGTH_SHORT).show();
-                        }
-
-                        /*JSONArray result = aaa.getJSONArray("results");
-                        Log.d("result",result.toString());*/
-
-                        if(aaa!=null)
-                        {
-                            JSONArray result = aaa.getJSONArray("results");
-                            Log.d("result",result.toString());
-
-                            JSONObject first = result.getJSONObject(0);
-                            String address = first.getString("formatted_address");
-                            String sample = address.replace(",", "");
-                            String[] elements = sample.split(" ");
-
-                            String input = eAddress.getText().toString();
-                            input = input.replace(",", "");
-                            String[] inputs = input.split(" ");
-
-                            Boolean add = checkAddress(elements,inputs,elements.length);
-
-                          //  Boolean add = true;
-                            if(add)
-                            {
-
-                                if(selectedImg.equalsIgnoreCase(""))
-                                {
-                                    builder1.setTitle("Confirm submission");
-                                    builder1.setMessage("Are you sure you want to continue without adding an image?");
-                                    builder1.setCancelable(true);
-
-                                    builder1.setPositiveButton(
-                                            "Yes",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int ida) {
-                                                    Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
-                                                    //new PostData().execute(data);
-                                                    //execute the async task
-                                                    asyncTask.execute(data);
-                                                    errorcount =0;
-                                                    dialog.cancel();
-                                                }
-                                            });
-
-                                    builder1.setNegativeButton(
-                                            "No",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-
-                                    AlertDialog alert11 = builder1.create();
-                                    alert11.show();
-
-                                }
-                                else{
-
-                                    builder1.setTitle("Confirm submission");
-                                    builder1.setMessage("Are you sure?");
-                                    builder1.setCancelable(true);
-
-                                    builder1.setPositiveButton(
-                                            "Yes",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int ida) {
-                                                    Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
-                                                    // new PostData().execute(data);
-                                                    asyncTask.execute(data);
-                                                    errorcount =0;
-                                                }
-                                            });
-
-                                    builder1.setNegativeButton(
-                                            "No",
-                                            new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    dialog.cancel();
-                                                }
-                                            });
-
-                                    AlertDialog alert11 = builder1.create();
-                                    alert11.show();
-
-
-                                }
-                            }
-                            else{
-                                errorcount+=1;
-                                if(errorcount>5)
-                                {
-                                    Toast.makeText(getBaseContext(),"You seem to not know your the accurate address of your location. " +
-                                            "Please get the accurate address before trying again",Toast.LENGTH_SHORT).show();
-
-                                }
-                                else{
-                                    Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or " +
-                                            "you are not at the correct location",Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }
-                        else{
-                            Toast.makeText(getApplicationContext(),"Cannot check address, please try again later",Toast.LENGTH_SHORT).show();
-                        }
-
-
-                        //  Log.d("address",address);
-
-
-
-                    }catch (Exception e){
-                        e.printStackTrace();
+                    if(lat!=null && longt!=null)
+                    {
+                        astask.execute(new TaskParams(lat,longt));
                     }
                 }
             }
@@ -420,6 +301,131 @@ public class ContributeActivity extends AppCompatActivity{
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, llistener);
     }
 
+    @Override
+    public void processFinish(JSONObject obj) {
+
+        try{
+            final JSONObject data = new JSONObject();
+
+            data.put("name", eName.getText().toString());
+            data.put("address",eAddress.getText().toString());
+            data.put("lat",lat);
+            data.put("long",longt);
+            data.put("desc",eDesc.getText().toString());
+            data.put("image",selectedImg.replace("=",""));
+            data.put("category",spinner.getSelectedItem().toString());
+
+
+            //JSONArray result = obj.getJSONArray("results");
+            //Log.d("result",result.toString());
+
+            if(obj!=null)
+            {
+                JSONArray result = obj.getJSONArray("results");
+                Log.d("result",result.toString());
+
+                JSONObject first = result.getJSONObject(0);
+                String address = first.getString("formatted_address");
+                String sample = address.replace(",", "");
+                String[] elements = sample.split(" ");
+
+                String input = eAddress.getText().toString();
+                input = input.replace(",", "");
+                String[] inputs = input.split(" ");
+
+                Boolean add = checkAddress(elements,inputs,elements.length);
+
+                //  Boolean add = true;
+                if(add)
+                {
+
+                    if(selectedImg.equalsIgnoreCase(""))
+                    {
+                        builder1.setTitle("Confirm submission");
+                        builder1.setMessage("Are you sure you want to continue without adding an image?");
+                        builder1.setCancelable(true);
+
+                        builder1.setPositiveButton(
+                                "Yes",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int ida) {
+                                        Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                        //new PostData().execute(data);
+                                        //execute the async task
+                                        asyncTask.execute(data);
+                                        errorcount =0;
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        builder1.setNegativeButton(
+                                "No",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
+
+                    }
+                    else{
+
+                        builder1.setTitle("Confirm submission");
+                        builder1.setMessage("Are you sure?");
+                        builder1.setCancelable(true);
+
+                        builder1.setPositiveButton(
+                                "Yes",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int ida) {
+                                        Toast.makeText(getBaseContext(),"Address is correct",Toast.LENGTH_SHORT).show();
+                                        // new PostData().execute(data);
+                                        asyncTask.execute(data);
+                                        errorcount =0;
+                                    }
+                                });
+
+                        builder1.setNegativeButton(
+                                "No",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+
+                        AlertDialog alert11 = builder1.create();
+                        alert11.show();
+
+
+                    }
+                }
+                else{
+                    errorcount+=1;
+                    if(errorcount>5)
+                    {
+                        Toast.makeText(getBaseContext(),"You seem to not know your the accurate address of your location. " +
+                                "Please get the accurate address before trying again",Toast.LENGTH_SHORT).show();
+
+                    }
+                    else{
+                        Toast.makeText(getBaseContext(),"Either you have enterred an incorrect address or " +
+                                "you are not at the correct location",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+            else{
+                Toast.makeText(getApplicationContext(),"Cannot check address, please try again later",Toast.LENGTH_SHORT).show();
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+    }
+
     class PostData extends AsyncTask<JSONObject,JSONObject,JSONObject>
     {
         @Override
@@ -492,8 +498,70 @@ public class ContributeActivity extends AppCompatActivity{
         }
     }
 
+    private static class TaskParams{
+        String lat;
+        String longt;
 
-    class ASCallApi extends AsyncTask<>
+
+        public TaskParams(String lat, String longt) {
+            this.lat = lat;
+            this.longt = longt;
+        }
+
+        public String getLat() {
+            return lat;
+        }
+
+        public void setLat(String lat) {
+            this.lat = lat;
+        }
+
+        public String getLongt() {
+            return longt;
+        }
+
+        public void setLongt(String longt) {
+            this.longt = longt;
+        }
+    }
+
+
+    class ASCallApi extends AsyncTask<TaskParams,JSONObject,JSONObject>
+    {
+        public AsyncResponse1 delegate = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected JSONObject doInBackground(TaskParams... params) {
+
+            TaskParams param = params[0];
+            try {
+                JSONObject ob = callApi(param.getLat(), param.getLongt());
+
+                if (ob != null)
+                {
+                    return ob;
+                }
+
+
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            delegate.processFinish(jsonObject);
+        }
+    }
 
 
     @Override
