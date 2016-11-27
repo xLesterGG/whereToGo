@@ -1,6 +1,10 @@
 package com.example.lesgo.wheretogo;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,6 +74,26 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
     RideRequestButton uberbtn;
 
+    AlertDialog.Builder builder1;
+
+    public static final int SPINNER = 2;
+    private ProgressDialog progressDialog;
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Post comment..");
+
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+
+        return progressDialog;
+    }
+
+
+
 
 
     @Override
@@ -76,7 +101,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_place);
 
-
+        builder1 = new AlertDialog.Builder(this);
         latestrating ="1";
         uberbtn = (RideRequestButton)findViewById(R.id.uber);
         uberbtn.setEnabled(false); // prevent clicking until data is loaded
@@ -191,8 +216,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
             }
 
-
-
             if(comments.length()>=1)
             {
                 norating.setVisibility(View.GONE);
@@ -214,24 +237,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
                     Comment c = new Comment(com,name,rating);
                     comment_list.add(c);
                 }
-
-
-             /*   for(int i=0;i<comments.length();i++)
-                {
-                    JSONObject comment = comments.getJSONObject(i);
-
-                    String name,com,rating;
-
-                    name = comment.getString("username");
-                    com = comment.getString("comment");
-                    rating = comment.getString("rating");
-
-                    totalrating += Integer.valueOf(rating);
-                    nofrating +=1;
-
-                    Comment c = new Comment(com,name,rating);
-                    comment_list.add(c);
-                }*/
 
                 int avgr = totalrating/nofrating;
                 avgrating.setText(String.valueOf(avgr));
@@ -260,15 +265,8 @@ public class ShowPlaceActivity extends AppCompatActivity {
             Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             img.setImageBitmap(decodedImg);
 
-            //imgencoded = null;
-            //img.setImageResource(R.drawable.noimg);
-           // img.setBackgroundColor(Color.TRANSPARENT);
         }
-      /*  else{
-            byte[] decodedString = Base64.decode(imgencoded, Base64.NO_WRAP);
-            Bitmap decodedImg = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            img.setImageBitmap(decodedImg);
-        }*/
+
 
 
         ratingbar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
@@ -314,54 +312,81 @@ public class ShowPlaceActivity extends AppCompatActivity {
                 else
                 {
 
-                    JSONObject data = new JSONObject();
-                    try{
-                        data.put("name", namestr);
-                        data.put("address",addr);
-                        data.put("lat",latitude);
-                        data.put("long",longtitude);
-                        data.put("desc",descstr);
-                        data.put("image",imgencoded);
-                        data.put("category",categorystr);
+                    builder1.setTitle("Confirm submission");
+                    builder1.setMessage("Confirm comment submission?");
+                    builder1.setCancelable(true);
+
+                    builder1.setPositiveButton(
+                            "Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int ida) {
+                                    dialog.cancel();
+
+                                    JSONObject data = new JSONObject();
+                                    try{
+                                        data.put("name", namestr);
+                                        data.put("address",addr);
+                                        data.put("lat",latitude);
+                                        data.put("long",longtitude);
+                                        data.put("desc",descstr);
+                                        data.put("image",imgencoded);
+                                        data.put("category",categorystr);
 
 
-                       // Log.d("aaaaaa",comments.toString() );
+                                        // comments //comments is json array
+                                        JSONObject comment = new JSONObject();
+                                        //comment.put("rating",spinner.getSelectedItem().toString());
+                                        comment.put("rating",String.valueOf(latestrating));
 
-                        // comments //comments is json array
-                        JSONObject comment = new JSONObject();
-                        //comment.put("rating",spinner.getSelectedItem().toString());
-                        comment.put("rating",String.valueOf(latestrating));
+                                        if(username.getText().toString().equalsIgnoreCase(""))
+                                        {
+                                            comment.put("username","anon");
 
-                        if(username.getText().toString().equalsIgnoreCase(""))
-                        {
-                           comment.put("username","anon");
+                                        }
+                                        else
+                                        {
+                                            comment.put("username",username.getText().toString());
+                                        }
 
-                        }
-                        else
-                        {
-                            comment.put("username",username.getText().toString());
-                        }
+                                        comment.put("comment",commen.getText().toString());
 
-                        comment.put("comment",commen.getText().toString());
+                                        comments.put(comment);
 
-                        comments.put(comment);
+                                        data.put("comments",comments);
 
-                        data.put("comments",comments);
+                                        // Log.d("aaaaaa",spinner.getSelectedItem().toString() + "    " + commen.getText().toString() );
+                                        //Log.d("aaaaaa",comments.toString() );
 
-                       // Log.d("aaaaaa",spinner.getSelectedItem().toString() + "    " + commen.getText().toString() );
-                        //Log.d("aaaaaa",comments.toString() );
+                                        TaskParams param = new TaskParams(data,id);
+                                        new postCom().execute(param);
+                                        //  postComment(data.toString(),id);
 
-                       TaskParams param = new TaskParams(data,id);
-                       new postCom().execute(param);
-                      //  postComment(data.toString(),id);
-
-                       // Toast.makeText(getBaseContext(),"posted",Toast.LENGTH_SHORT);
+                                        // Toast.makeText(getBaseContext(),"posted",Toast.LENGTH_SHORT);
 
 
-                    }catch(Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                                    }catch(Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+
+
+                                }
+                            });
+
+                    builder1.setNegativeButton(
+                            "No",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
+
+
+
+
                 }
 
             }
@@ -430,6 +455,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            showDialog(SPINNER);
         }
 
         @Override
@@ -463,13 +489,14 @@ public class ShowPlaceActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
+            dismissDialog(SPINNER);
 
             if(aBoolean)
             {
                 Toast.makeText(getBaseContext(),"Successfully commented",Toast.LENGTH_SHORT).show();
 
                 try{ // refresh data
-                    finish1();
+                    finish();
 
                     JSONObject updated = getOnePlace(id);
 
@@ -486,21 +513,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
                     intent1.putExtra("id",updated.getString("_id"));
                     intent1.putExtra("comments",updated.getString("comments"));
                     intent1.putExtra("status","ok"); // to indicate comment has occured*/
-                   // finish1();
 
-                  /*  Intent intent = new Intent();
-                    intent.setClass(getApplicationContext(),ShowPlaceActivity.class);
-                    intent.putExtra("name","aaa");
-                    intent.putExtra("address","aaa");
-                    intent.putExtra("desc","aaa");
-                    intent.putExtra("category","aaa");
-                    intent.putExtra("image","aaa");
-                    intent.putExtra("lat","aaa");
-                    intent.putExtra("long","aaa");
-
-                    intent.putExtra("id","123");
-                    intent.putExtra("comments","");
-                    startActivity(intent);*/
 
                    /* overridePendingTransition(0, 0);
 
@@ -566,7 +579,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
     public void onBackPressed() {
 
         if(bundle.getString("status")!=null){
-            Log.d("OK","OK"); // it can reach here
+            Log.d("bundle not null","OK"); // it can reach here
 
             finish();
             super.onBackPressed();
@@ -575,8 +588,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
             finish1();
             super.onBackPressed();
         }
-
-
 
     }
 
@@ -591,6 +602,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         Intent data = new Intent();
         setResult(RESULT_CANCELED, data);
         super.finish();
+
     }
 
 }

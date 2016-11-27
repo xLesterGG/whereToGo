@@ -171,7 +171,6 @@ public class BlankFragment extends Fragment {
         if(requestCode ==1)
         {
             Log.d("result", String.valueOf(resultCode));
-
             if(resultCode == Activity.RESULT_OK)
             {
                /* Toast.makeText(getActivity().getApplicationContext(), "IS OK", Toast.LENGTH_SHORT).show();
