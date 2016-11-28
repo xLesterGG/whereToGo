@@ -1,5 +1,6 @@
 package com.example.lesgo.wheretogo;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -245,5 +246,32 @@ public class SearchActivity extends AppCompatActivity implements AsyncResponse{
         }
 
     }
+
+    /*@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("requestcode IN SEARCH",String.valueOf(requestCode));
+        if(requestCode ==1)
+        {
+            Log.d("result in search", String.valueOf(resultCode));
+            if(resultCode == Activity.RESULT_OK)
+            {
+                finish();
+
+                Intent i = new Intent();
+                i.setClass(getApplicationContext(),SearchActivity.class);
+
+                startActivity(i);
+
+            }
+
+            //if(resultCode == Activity.RESULT_CANCELED)
+            //Toast.makeText(getActivity().getApplicationContext(), "IS cancel", Toast.LENGTH_SHORT).show();
+
+
+        }
+    }*/
+
 
 }

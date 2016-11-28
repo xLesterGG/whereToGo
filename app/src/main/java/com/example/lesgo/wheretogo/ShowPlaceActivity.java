@@ -61,7 +61,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
     EditText commen,username;
     JSONArray comments;
     Button addcomment;
-    String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray,latestrating;
+    String namestr,categorystr,addr,descstr,imgencoded,latitude,longtitude,id,commentarray,latestrating,checking;
     RatingBar ratingbar;
     RecyclerView recy_view;
     CommentsAdapter adapter1;
@@ -94,12 +94,20 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_place);
+
+        bundle = getIntent().getExtras();
+
+        checking = "";
+      //  bundle.getString("status")!=null
+        if(getIntent().hasExtra("status"))
+        {
+            checking = bundle.getString("status");
+        }
+
 
         builder1 = new AlertDialog.Builder(this);
         latestrating ="1";
@@ -148,7 +156,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
         ratingbar = (RatingBar)findViewById(R.id.ratingBar);
 
 
-        bundle = getIntent().getExtras();
+
         namestr = bundle.getString("name");
         categorystr = bundle.getString("category");
         addr = bundle.getString("address");
@@ -354,13 +362,9 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
                                         data.put("comments",comments);
 
-                                        // Log.d("aaaaaa",spinner.getSelectedItem().toString() + "    " + commen.getText().toString() );
-                                        //Log.d("aaaaaa",comments.toString() );
-
                                         TaskParams param = new TaskParams(data,id);
                                         new postCom().execute(param);
                                         //  postComment(data.toString(),id);
-
                                         // Toast.makeText(getBaseContext(),"posted",Toast.LENGTH_SHORT);
 
 
@@ -368,7 +372,6 @@ public class ShowPlaceActivity extends AppCompatActivity {
                                     {
                                         e.printStackTrace();
                                     }
-
 
                                 }
                             });
@@ -384,11 +387,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
                     AlertDialog alert11 = builder1.create();
                     alert11.show();
 
-
-
-
                 }
-
             }
         });
 
@@ -493,11 +492,12 @@ public class ShowPlaceActivity extends AppCompatActivity {
 
             if(aBoolean)
             {
-                Toast.makeText(getBaseContext(),"Successfully commented",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(),"Successfully commented",Toast.LENGTH_LONG).show();
 
                 try{ // refresh data
-                    finish();
-
+                  //  finish1();
+                   // finish1();
+                   // finish();
                     JSONObject updated = getOnePlace(id);
 
                     Intent intent1 = new Intent();
@@ -518,7 +518,7 @@ public class ShowPlaceActivity extends AppCompatActivity {
                    /* overridePendingTransition(0, 0);
 
                     intent1.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);*/
-                    startActivity(intent1);
+                    startActivityForResult(intent1,100);
                    // finish();
                 }catch (Exception e){
                     e.printStackTrace();
@@ -581,28 +581,37 @@ public class ShowPlaceActivity extends AppCompatActivity {
         if(bundle.getString("status")!=null){
             Log.d("bundle not null","OK"); // it can reach here
 
+            setResult(RESULT_OK);
             finish();
-            super.onBackPressed();
         }
         else{
-            finish1();
+          //  finish();
             super.onBackPressed();
         }
 
     }
 
+
     @Override
-    public void finish() {
-        Intent data = new Intent();
-        setResult(RESULT_OK, data);
-        super.finish();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("ONACTIVITYRESULT","RESULT");
+        if(requestCode ==100)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                setResult(RESULT_OK);
+                Log.d("ONACTIVITYRESULT","RESULT ok ");
+                finish();
+            }
+            else
+            {
+                setResult(RESULT_CANCELED);
+                Log.d("ONACTIVITYRESULT","RESULT NOT ");
+
+                finish();
+            }
+        }
     }
-
-    public void finish1() {
-        Intent data = new Intent();
-        setResult(RESULT_CANCELED, data);
-        super.finish();
-
-    }
-
 }

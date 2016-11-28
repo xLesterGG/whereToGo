@@ -81,7 +81,7 @@ public class ContributeActivity extends AppCompatActivity implements AsyncRespon
         submit = (Button)findViewById(R.id.submit);
         eName = (EditText)findViewById(R.id.name);
         eAddress= (EditText)findViewById(R.id.address);
-        eAddress.setText("1327e, Lorong Bayor Bukit 16, Tabuan Jaya, 93350 Kuching, Sarawak, Malaysia");
+       // eAddress.setText("1327e, Lorong Bayor Bukit 16, Tabuan Jaya, 93350 Kuching, Sarawak, Malaysia");
         eLat= (EditText)findViewById(R.id.latitude);
         eLong= (EditText)findViewById(R.id.longitude);
         eDesc= (EditText)findViewById(R.id.description);

@@ -168,11 +168,14 @@ public class BlankFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("requestcode",String.valueOf(requestCode));
         if(requestCode ==1)
         {
             Log.d("result", String.valueOf(resultCode));
             if(resultCode == Activity.RESULT_OK)
             {
+                getActivity().finish();
                /* Toast.makeText(getActivity().getApplicationContext(), "IS OK", Toast.LENGTH_SHORT).show();
                getActivity().finish();*/
                 Intent i = new Intent();
