@@ -59,10 +59,10 @@ public class ContributeActivity extends AppCompatActivity implements AsyncRespon
     String selectedImg = "";
     TextView gps;
     Spinner spinner;
-    int errorcount;
+    int errorcount=0;
     AlertDialog.Builder builder1;
 
-    ASCallApi astask = new ASCallApi();
+   // ASCallApi astask= new ASCallApi();
     PostData asyncTask =new PostData();
 
 
@@ -71,7 +71,7 @@ public class ContributeActivity extends AppCompatActivity implements AsyncRespon
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contribute);
 
-        astask.delegate = this;
+       // astask.delegate = this;
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -165,7 +165,17 @@ public class ContributeActivity extends AppCompatActivity implements AsyncRespon
 
                     if(lat!=null && longt!=null)
                     {
-                        astask.execute(new TaskParams(lat,longt));
+                       // astask.delegate = this;
+
+                        ASCallApi ast = new ASCallApi();
+                        ast.delegate = ContributeActivity.this;
+                        ast.execute(new TaskParams(lat,longt));
+
+                       /* astask = new ASCallApi();
+                        astask.execute(new TaskParams(lat,longt));*/
+
+
+
                     }
                 }
             }
@@ -423,7 +433,7 @@ public class ContributeActivity extends AppCompatActivity implements AsyncRespon
             e.printStackTrace();
         }
 
-
+        Log.d("done","done");
     }
 
     class PostData extends AsyncTask<JSONObject,JSONObject,JSONObject>
